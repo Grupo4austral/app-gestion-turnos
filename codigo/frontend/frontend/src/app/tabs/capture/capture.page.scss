@@ -1,0 +1,48 @@
+ion-content {
+    --background: #f9f9f9;
+  }
+  
+  .titulo-servicios {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 15px;
+  
+    h2 {
+      color: #1e88e5;
+      font-weight: 700;
+      font-size: 22px;
+    }
+  
+    p {
+      color: #555;
+      font-size: 15px;
+    }
+  }
+  
+  ion-card {
+    margin-top: 12px;
+    border-radius: 15px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    background: #fff;
+  
+    ion-card-header {
+      padding-bottom: 5px;
+    }
+  
+    ion-card-title {
+      color: #222;
+      font-weight: 600;
+      font-size: 17px;
+    }
+  
+    ion-card-content {
+      font-size: 14.5px;
+      color: #555;
+    }
+  
+    .precio {
+      color: #2e7d32;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+  }

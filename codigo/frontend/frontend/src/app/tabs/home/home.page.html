@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Bienvenida -->
+  <div class="bienvenida">
+    <h2>¡Bienvenido, Franco!</h2>
+    <p>Tu espacio para gestionar turnos y explorar nuestros servicios.</p>
+  </div>
+
+  <!-- Tarjeta de resumen -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Resumen de tu cuenta</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Próximo turno:</strong> Ninguno reservado</p>
+      <p><strong>Servicios favoritos:</strong> Corte de pelo, Coloración</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Accesos rápidos -->
+  <h3>Accesos rápidos</h3>
+  <div class="botones-rapidos">
+    <ion-button expand="block" color="success" routerLink="turnos">
+      <ion-icon slot="start" name="calendar-outline"></ion-icon>
+      Ver mis turnos
+    </ion-button>
+
+    <ion-button expand="block" color="tertiary" routerLink="capture">
+      <ion-icon slot="start" name="cut-outline"></ion-icon>
+      Ver servicios
+    </ion-button>
+  </div>
+
+  <!-- Pie -->
+  <div class="footer-home">
+    <p>Gracias por usar nuestra app 💙</p>
+  </div>
+
+</ion-content>
