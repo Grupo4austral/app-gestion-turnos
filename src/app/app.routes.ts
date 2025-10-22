@@ -51,12 +51,5 @@ export const routes: Routes = [
       }
     ]
   },
-  {
-    path: 'sucursal',
-    loadComponent: () => import('./tabs/sucursal/sucursal.page').then( m => m.SucursalPage)
-  },
-  {
-    path: 'prestador',
-    loadComponent: () => import('./tabs/prestador/prestador.page').then( m => m.PrestadorPage)
-  }
+  
 ];
