@@ -1,45 +1,83 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Mis Turnos</ion-title>
+    <ion-title>Gestión de Turnos</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
-  <!-- Título -->
-  <div class="titulo-turnos">
-    <h2>📅 Turnos Reservados</h2>
-    <p>Consultá tus próximos turnos o agendá uno nuevo.</p>
-  </div>
-
-  <!-- Tarjeta de Turno 1 -->
+  <!-- Formulario para agregar turno -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Corte de pelo</ion-card-title>
-      <ion-card-subtitle>12 de octubre, 15:00 hs</ion-card-subtitle>
+      <ion-card-title>Reservá tu turno</ion-card-title>
+      <ion-card-subtitle>Completá los datos para confirmar tu cita</ion-card-subtitle>
     </ion-card-header>
+
     <ion-card-content>
-      <p class="estado confirmado">✅ Confirmado</p>
+
+      <!-- Servicio -->
+      <ion-item>
+        <ion-label position="stacked">Tipo de servicio</ion-label>
+        <ion-select placeholder="Seleccionar servicio" [(ngModel)]="nuevoTurno.id_servicio">
+          <ion-select-option *ngFor="let s of servicios" [value]="s.id">
+            {{ s.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Prestador -->
+      <ion-item>
+        <ion-label position="stacked">Profesional asignado</ion-label>
+        <ion-select placeholder="Seleccionar profesional" [(ngModel)]="nuevoTurno.id_prestador">
+          <ion-select-option *ngFor="let p of prestadores" [value]="p.id">
+            {{ p.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Sucursal -->
+      <ion-item>
+        <ion-label position="stacked">Sucursal</ion-label>
+        <ion-select placeholder="Seleccionar sucursal" [(ngModel)]="nuevoTurno.id_sucursal">
+          <ion-select-option *ngFor="let su of sucursales" [value]="su.id">
+            {{ su.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Fecha y hora de inicio -->
+      <ion-item>
+        <ion-label position="stacked">Fecha y hora de inicio</ion-label>
+        <ion-datetime
+          display-format="YYYY-MM-DD HH:mm"
+          [(ngModel)]="nuevoTurno.inicio">
+        </ion-datetime>
+      </ion-item>
+
+      <!-- Notas -->
+      <ion-item>
+        <ion-label position="stacked">Notas</ion-label>
+        <ion-input placeholder="Ej: revisión general, limpieza..." [(ngModel)]="nuevoTurno.notas"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" color="primary" (click)="agregarTurno()">Confirmar turno</ion-button>
+
     </ion-card-content>
   </ion-card>
 
-  <!-- Tarjeta de Turno 2 -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Coloración</ion-card-title>
-      <ion-card-subtitle>18 de octubre, 17:30 hs</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <p class="estado pendiente">⏳ Pendiente de confirmación</p>
-    </ion-card-content>
-  </ion-card>
+  <!-- Listado de turnos -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Turnos confirmados</ion-label>
+    </ion-list-header>
 
-  <!-- Botón de nuevo turno -->
-  <div class="nuevo-turno">
-    <ion-button expand="block" color="success">
-      <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-      Reservar nuevo turno
-    </ion-button>
-  </div>
+    <ion-item *ngFor="let t of turnos">
+      <ion-label>
+        <h2>{{ t.servicio_nombre }} — {{ t.estado }}</h2>
+        <p>Profesional: {{ t.prestador_nombre }} | {{ t.inicio | date:'short' }}</p>
+        <p>Sucursal: {{ t.sucursal_nombre }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
 </ion-content>
