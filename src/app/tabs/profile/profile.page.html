@@ -65,23 +65,21 @@
         <ion-button
           *ngIf="!editarActivo"
           expand="block"
-          color="primary"
           (click)="editarPerfil()"
-          class="action-btn"
+          class="btn-editar"
         >
           Editar Perfil
         </ion-button>
 
         <div *ngIf="editarActivo" class="edit-buttons">
-          <ion-button color="success" (click)="guardarCambios()">Guardar</ion-button>
-          <ion-button color="medium" (click)="cancelarEdicion()">Cancelar</ion-button>
+          <ion-button class="btn-guardar" (click)="guardarCambios()">Guardar</ion-button>
+          <ion-button class="btn-cancelar" (click)="cancelarEdicion()">Cancelar</ion-button>
         </div>
 
         <ion-button
           expand="block"
-          color="danger"
           (click)="logout()"
-          class="logout-btn"
+          class="btn-cerrar"
         >
           Cerrar Sesión
         </ion-button>

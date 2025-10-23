@@ -1,5 +1,5 @@
 .profile-container {
-  --background: linear-gradient(135deg, #1e3c72, #2a5298);
+  --background: linear-gradient(135deg, #052152, #052152);
   height: 100%;
 }
 
@@ -34,7 +34,7 @@
 
   h2 {
     font-size: 1.8rem;
-    color: #ffffff;
+    color: #fefefe;
     font-weight: 600;
   }
 }
@@ -52,7 +52,7 @@
   height: 110px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #5aa0ff;
+  border: 3px solid #072c60;
   background-color: #fff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   cursor: pointer;
@@ -74,7 +74,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(7, 55, 89, 0.95);
   border-radius: 10px;
   padding: 10px;
   margin-top: 10px;
@@ -111,7 +111,7 @@
     --color: #ffffff;
     color: #fff;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(131, 126, 126, 0.308);
     margin-bottom: 10px;
 
     ion-label {
@@ -151,28 +151,54 @@
     }
   }
 }
-
-.action-btn {
-  width: 70%;
+ion-button {
   border-radius: 10px;
   font-weight: 600;
-}
-
-.logout-btn {
-  width: 70%;
-  background: #e74c3c;
-  border-radius: 10px;
-  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease-in-out;
 
   &:hover {
-    background-color: #c0392b;
+    transform: translateY(-2px);
   }
 }
 
-ion-note[color='danger'] {
-  font-size: 0.85rem;
-  margin-top: 4px;
+
+/* 🔵 Editar perfil */
+.btn-editar {
+  --background: #315277;
+  --background-hover: #063362;
 }
+
+/* 🟢 Guardar cambios */
+.btn-guardar {
+  --background: #065619;
+  --background-hover: #065619;
+}
+
+/* ⚪ Cancelar edición */
+.btn-cancelar {
+  --background: #6c757d;
+  --background-hover: #545b62;
+}
+
+/* 🔴 Cerrar sesión */
+.btn-cerrar {
+  --background: #54040c;
+  --background-hover: #54040c;
+  width: 80%;
+  max-width: 320px;
+  margin: 0 auto;
+  display: block;
+  height: 52px;          /* 🔹 Aumenta la altura del botón */
+  font-size: 1rem; 
+}
+
+
+
+
+
+
 
 /* Animación */
 @keyframes fadeIn {
