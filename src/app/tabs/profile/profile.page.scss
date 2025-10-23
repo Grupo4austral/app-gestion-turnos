@@ -1,17 +1,17 @@
 .profile-container {
-  --background: linear-gradient(135deg, #052152, #052152);
+  --background: linear-gradient(135deg, #1e2a3a, #1e2a3a);
   height: 100%;
 }
 
-/* El contenedor interno se centra vertical y horizontalmente */
+
 .profile-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* asegura que ocupe toda la pantalla */
+  min-height: 100vh; 
 }
 
-/* Tarjeta principal */
+
 .profile-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
@@ -28,7 +28,7 @@
   align-items: center;
 }
 
-/* Encabezado */
+
 .profile-header {
   margin-bottom: 1.5rem;
 
@@ -39,7 +39,7 @@
   }
 }
 
-/* Avatar */
+
 .avatar-section {
   display: flex;
   flex-direction: column;
@@ -69,7 +69,6 @@
   }
 }
 
-/* Menú de avatares */
 .avatar-menu {
   display: flex;
   flex-wrap: wrap;
@@ -101,7 +100,7 @@
   }
 }
 
-/* Información del perfil */
+
 .profile-info {
   margin-bottom: 1.5rem;
   width: 100%;
@@ -126,7 +125,7 @@
   }
 }
 
-/* Botones */
+
 .button-group {
   display: flex;
   flex-direction: column;
@@ -164,25 +163,24 @@ ion-button {
 }
 
 
-/* 🔵 Editar perfil */
+
 .btn-editar {
   --background: #315277;
   --background-hover: #063362;
 }
 
-/* 🟢 Guardar cambios */
+
 .btn-guardar {
   --background: #065619;
   --background-hover: #065619;
 }
 
-/* ⚪ Cancelar edición */
 .btn-cancelar {
   --background: #6c757d;
   --background-hover: #545b62;
 }
 
-/* 🔴 Cerrar sesión */
+
 .btn-cerrar {
   --background: #54040c;
   --background-hover: #54040c;
@@ -190,7 +188,7 @@ ion-button {
   max-width: 320px;
   margin: 0 auto;
   display: block;
-  height: 52px;          /* 🔹 Aumenta la altura del botón */
+  height: 52px;          
   font-size: 1rem; 
 }
 

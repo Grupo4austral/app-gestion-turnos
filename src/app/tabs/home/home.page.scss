@@ -1,5 +1,5 @@
 .home-background {
-  --background: linear-gradient(180deg, #1e2a3a 0%, #0f1722 100%);
+  --background: linear-gradient(180deg, #1e2a3a 0%, #1e2a3a 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,7 +18,7 @@
 }
 
 .service-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(195, 195, 195, 0.373);
   border-radius: 15px;
   text-align: center;
   transition: 0.3s;
@@ -35,13 +35,13 @@
 
 .service-card:hover {
   transform: scale(1.05);
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(223, 219, 219, 0.34);
 }
 
-/* 🔹 Mantengo los íconos igual */
+
 .service-icon {
   font-size: 40px;
-  color: #4cc9f0;
+  color: #187794;
   margin-bottom: 10px;
 }
 
@@ -51,18 +51,18 @@
   font-weight: 500;
 }
 
-/* ✅ Solo modificamos esta parte */
+
 .service-image {
-  width: 50%;                /* antes: 100% */
-  max-width: 100px;          /* limita tamaño máximo */
-  height: auto;              /* mantiene proporción */
-  object-fit: contain;       /* evita recortes */
+  width: 50%;               
+  max-width: 100px;          
+  height: auto;              
+  object-fit: contain;      
   border-radius: 5px;
   margin-bottom: 5px;
   transition: transform 0.3s ease;
 }
 
-/* Efecto suave al pasar el mouse */
+
 .service-card:hover .service-image {
   transform: scale(1.05);
 }
