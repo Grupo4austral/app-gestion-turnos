@@ -16,10 +16,9 @@ export class HomePage {
   constructor(private router: Router) {}
 
   servicios = [
-    { nombre: 'Mecánica', icon: 'car-outline', route: '/tabs/health', imagen: 'assets/img/avatars/avatar1.svg'},
-    { nombre: 'Peluquería', icon: 'cut-outline', route: '/tabs/health', imagen: 'assets/peluqueria.png' },
-    { nombre: 'Veterinaria', icon: 'paw-outline', route: '/tabs/health', imagen: 'assets/img/avatars/avatar3.svg' },
-    { nombre: 'Servicio', icon: 'construct-outline', route: '/tabs/capture', imagen: 'assets/img/avatars/avatar4.svg' },
+    { nombre: 'Perfil', icon: 'car-outline', route: '/tabs/profile', imagen: 'assets/img/user_17766670.svg'},
+    { nombre: 'Mis turnos', icon: 'paw-outline', route: '/tabs/health', imagen: 'assets/img/turnos.png' },
+    { nombre: 'Inicio', icon: 'construct-outline', route: '/login', imagen: 'assets/img/log-out-outline.svg'},
 
   ];
 

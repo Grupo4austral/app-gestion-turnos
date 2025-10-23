@@ -16,19 +16,20 @@ import { SupabaseClient } from '@supabase/supabase-js';
 export class ProfilePage implements OnInit {
   private supabase: SupabaseClient = supabase;
 
-  // Datos del perfil
   nombre_usuario: string = '';
   email: string = '';
   ubicacion: string = '';
+  dni: string = '';
   editarActivo = false;
+  dniError: boolean = false;
 
-  // Avatares
   showAvatarMenu = false;
   selectedAvatarPath = 'assets/img/Avatars/avatar-default.png';
   avatars = [
     { name: 'Avatar 1', path: 'assets/img/Avatars/avatar1.svg' },
     { name: 'Avatar 2', path: 'assets/img/Avatars/avatar2.svg' },
     { name: 'Avatar 3', path: 'assets/img/Avatars/Avatar3.svg' },
+    { name: 'Avatar 4', path: 'assets/img/Avatars/avatar4.svg' },
   ];
 
   userId: string | null = null;
@@ -44,7 +45,6 @@ export class ProfilePage implements OnInit {
         this.userId = data.user.id;
         this.email = data.user.email ?? '';
 
-        // Traer datos del perfil desde la tabla "usuario"
         const { data: perfil, error: errPerfil } = await this.supabase
           .from('usuario')
           .select('*')
@@ -55,7 +55,8 @@ export class ProfilePage implements OnInit {
           console.warn('No se encontró perfil en tabla usuario:', errPerfil.message);
         } else {
           this.nombre_usuario = perfil.nombre_usuario ?? '';
-          this.ubicacion = perfil.ubicacion ?? perfil.numero_telefono ?? '';
+          this.ubicacion = perfil.ubicacion ?? '';
+          this.dni = perfil.dni ?? '';
         }
       }
     } catch (error) {
@@ -84,18 +85,27 @@ export class ProfilePage implements OnInit {
     try {
       if (!this.userId) throw new Error('Usuario no identificado');
 
-      // Actualizar en la tabla "usuario"
+      // ✅ Validar formato solo si el usuario ingresó algo
+      if (this.dni && !/^[0-9]{7,8}$/.test(this.dni)) {
+        this.dniError = true;
+        await this.mostrarToast('El DNI debe tener 7 u 8 números sin puntos 🪪', 'warning');
+        return;
+      } else {
+        this.dniError = false;
+      }
+
       const { error } = await this.supabase
         .from('usuario')
         .update({
           nombre_usuario: this.nombre_usuario,
           ubicacion: this.ubicacion,
+          dni: this.dni || null,
         })
         .eq('user_id', this.userId);
 
       if (error) throw error;
 
-      this.editarActivo = false; // ⬅️ Desactiva el modo edición
+      this.editarActivo = false;
       await this.mostrarToast('Perfil actualizado correctamente ✅');
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
@@ -121,3 +131,4 @@ export class ProfilePage implements OnInit {
     }
   }
 }
+
