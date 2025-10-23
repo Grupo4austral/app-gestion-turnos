@@ -1,37 +1,67 @@
-<ion-content class="profile-background">
-  <div class="profile-container">
+<ion-content class="profile-container">
+  <div class="profile-header">
+    <h2>Mi Perfil</h2>
+  </div>
 
-    <h1 class="profile-title">Mi Perfil</h1>
-
-    <div class="avatar-section">
-      <img [src]="selectedAvatar" alt="Avatar" class="avatar" (click)="toggleAvatarSelection()" />
+  <div class="avatar-section">
+    <div class="avatar-wrapper" (click)="editarActivo && toggleAvatarMenu()">
+      <img [src]="selectedAvatarPath" alt="Avatar" class="avatar-img" />
     </div>
 
-    <div class="avatar-picker" *ngIf="showAvatarPicker">
-      <div class="avatar-grid">
-        <img *ngFor="let avatar of avatars"
-             [src]="avatar"
-             class="avatar-option"
-             [class.selected]="avatar === selectedAvatar"
-             (click)="selectAvatar(avatar)" />
+    <!-- Menú de avatares (solo visible en modo edición) -->
+    <div class="avatar-menu" *ngIf="showAvatarMenu && editarActivo">
+      <div
+        *ngFor="let avatar of avatars"
+        class="avatar-option"
+        (click)="selectAvatar(avatar)"
+      >
+        <img [src]="avatar.path" [alt]="avatar.name" />
       </div>
-      <ion-button expand="block" color="primary" (click)="toggleAvatarSelection()">Cerrar</ion-button>
+    </div>
+  </div>
+
+  <div class="profile-info">
+    <ion-item lines="none">
+      <ion-label position="stacked">Nombre de Usuario</ion-label>
+      <ion-input [(ngModel)]="nombre_usuario" [readonly]="!editarActivo"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input [(ngModel)]="email" readonly></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="stacked">Ubicación</ion-label>
+      <ion-input [(ngModel)]="ubicacion" [readonly]="!editarActivo"></ion-input>
+    </ion-item>
+  </div>
+
+  <div class="button-group">
+    <!-- Botón Editar -->
+    <ion-button
+      *ngIf="!editarActivo"
+      expand="block"
+      color="primary"
+      (click)="editarPerfil()"
+    >
+      Editar Perfil
+    </ion-button>
+
+    <!-- Botones Guardar / Cancelar -->
+    <div *ngIf="editarActivo" class="edit-buttons">
+      <ion-button expand="block" color="success" (click)="guardarCambios()">Guardar</ion-button>
+      <ion-button expand="block" color="medium" (click)="cancelarEdicion()">Cancelar</ion-button>
     </div>
 
-    <ion-list *ngIf="!showAvatarPicker">
-      <ion-item>
-        <ion-label position="stacked">Nombre</ion-label>
-        <ion-input [(ngModel)]="nombre_usuario"></ion-input>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Correo electrónico</ion-label>
-        <ion-input [(ngModel)]="email"></ion-input>
-      </ion-item>
-
-      <ion-button expand="block" color="success" (click)="guardarCambios()">Guardar cambios</ion-button>
-      <ion-button expand="block" fill="outline" color="medium" (click)="logout()">Cerrar sesión</ion-button>
-    </ion-list>
-
+    <!-- Cerrar sesión -->
+    <ion-button
+      expand="block"
+      color="danger"
+      (click)="logout()"
+      class="logout-btn"
+    >
+      Cerrar Sesión
+    </ion-button>
   </div>
 </ion-content>
