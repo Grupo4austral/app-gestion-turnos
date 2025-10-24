@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { supabase } from '../supabase' // tu archivo de conexión con Supabase
+import { supabase } from '../supabase'; // tu conexión a Supabase
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DatabaseService {
-
-  async getAll(table: string) {
-    const { data, error } = await supabase.from(table).select('*');
+  async getAll(table: string, orderBy?: string, ascending = true) {
+    let q = supabase.from(table).select('*');
+    if (orderBy) q = q.order(orderBy, { ascending });
+    const { data, error } = await q;
     if (error) throw error;
     return data;
   }
@@ -18,15 +19,22 @@ export class DatabaseService {
     return data;
   }
 
-  async update(table: string, id: number, record: any) {
-    const { data, error } = await supabase.from(table).update(record).eq('id', id);
+  // retrocompatible: si no pasás idField, asume 'id'
+  async update(table: string, id: number, record: any, idField: string = 'id') {
+    const { data, error } = await supabase.from(table).update(record).eq(idField, id);
     if (error) throw error;
     return data;
   }
 
-  async delete(table: string, id: number) {
-    const { data, error } = await supabase.from(table).delete().eq('id', id);
+  async delete(table: string, id: number, idField: string = 'id') {
+    const { data, error } = await supabase.from(table).delete().eq(idField, id);
     if (error) throw error;
     return data;
   }
+
+  async getUser() {
+    const { data } = await supabase.auth.getUser();
+    return data?.user ?? null;
+  }
 }
+

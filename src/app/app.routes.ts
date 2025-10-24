@@ -30,10 +30,13 @@ export const routes: Routes = [
         path: 'stats',
         loadComponent: () => import('./tabs/stats/stats.page').then(m => m.StatsPage)
       },
-
       {
         path: 'profile',
         loadComponent: () => import('./tabs/profile/profile.page').then(m => m.ProfilePage)
+      },
+      {
+        path: 'comentario',
+        loadComponent: () => import('./tabs/comentario/comentario.page').then(m => m.ComentarioPage)
       },
       {
         path: '',
@@ -41,6 +44,6 @@ export const routes: Routes = [
         pathMatch: 'full'
       }
     ]
-  },
-  
+  }
 ];
+
