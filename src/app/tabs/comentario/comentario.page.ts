@@ -74,6 +74,7 @@ export class ComentarioPage implements OnInit {
   nuevoComentario: Comentario = { comentario: '', descripcion: '', puntuacion: 5 };
   editando: Comentario | null = null;
   userId: string = '';
+  isLoading = false; // Estado de carga
 
   constructor(private db: DatabaseService, private alertCtrl: AlertController) {
     addIcons({
@@ -92,10 +93,13 @@ export class ComentarioPage implements OnInit {
   }
 
   async cargarComentarios() {
+    this.isLoading = true;
     try {
       this.comentarios = await this.db.getAll('comentario', 'fecha_comentario', false);
     } catch (e) {
       console.error('Error al cargar comentarios', e);
+    } finally {
+      this.isLoading = false;
     }
   }
 

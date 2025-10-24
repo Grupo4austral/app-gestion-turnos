@@ -78,6 +78,21 @@
       <ion-label>Comentarios recientes</ion-label>
     </ion-list-header>
 
+    <!-- Spinner de carga -->
+    <div *ngIf="isLoading" class="ion-text-center ion-padding">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Cargando comentarios...</p>
+    </div>
+
+    <!-- Estado vacío -->
+    <ion-item *ngIf="!isLoading && comentarios.length === 0" lines="none">
+      <ion-label class="ion-text-center">
+        <p style="color: var(--ion-color-medium);">No hay comentarios aún</p>
+        <p style="color: var(--ion-color-medium); font-size: 0.9em;">¡Sé el primero en comentar!</p>
+      </ion-label>
+    </ion-item>
+
+    <!-- Lista de comentarios -->
     <ion-item *ngFor="let c of comentarios">
       <ion-label>
         <h2>{{ c.comentario }}</h2>
