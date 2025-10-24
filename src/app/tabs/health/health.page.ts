@@ -3,6 +3,7 @@
   import { FormsModule } from '@angular/forms';
   import { IonicModule, ToastController } from '@ionic/angular';
   import { supabase } from '../../supabase';
+  import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
   selector: 'app-health',
@@ -30,9 +31,13 @@ export class HealthPage implements OnInit {
     notas: ''
   };
 
-  constructor(private toastCtrl: ToastController) {}
+  constructor(
+    private toastCtrl: ToastController,
+    private analytics: AnalyticsService
+  ) {}
 
   async ngOnInit() {
+    this.analytics.trackPageView('health', '/tabs/health');
     await this.cargarUsuario();
     await this.cargarListas();
     await this.cargarTurnos();
@@ -136,9 +141,11 @@ export class HealthPage implements OnInit {
 
     if (error) {
       await this.mostrarToast('Error al guardar el turno: ' + error.message, 'danger');
+      this.analytics.trackError('turno_creation_error', error.message);
       console.error(error);
     } else {
       await this.mostrarToast('Turno guardado con éxito ✅', 'success');
+      this.analytics.trackTurnoCreated(nuevoTurnoData);
       this.nuevoTurno = {
         usuario_id: user.id,
         id_servicio: null,

@@ -10,20 +10,27 @@ Aplicación móvil desarrollada con **Ionic Angular** y **Supabase** para la ges
 - 📅 **Gestión de turnos** (crear, listar, editar, eliminar)
 - 👤 **Perfil de usuario** con avatares personalizables
 - 🏥 **Servicios** (CRUD completo)
-- 💬 **Sistema de comentarios** con puntuaciones
+- 💬 **Sistema de comentarios** con puntuaciones y búsqueda
 - 📊 **Dashboard** con estadísticas
+- 🌙 **Dark Mode** con persistencia
+- 📱 **PWA Ready** (funciona offline)
+- 🔔 **Push Notifications** (Capacitor)
+- 📈 **Analytics** integrado
+- 🔍 **Búsqueda en tiempo real**
 - 📱 **Responsive** (Web, iOS, Android)
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-- **Framework**: Ionic 8 + Angular 20
-- **Base de datos**: Supabase (PostgreSQL)
+- **Framework**: Ionic 8 + Angular 20 (Standalone Components)
+- **Base de datos**: Supabase (PostgreSQL con RLS)
 - **Autenticación**: Supabase Auth
 - **UI**: Ionic Components
 - **Lenguaje**: TypeScript 5.8
 - **Mobile**: Capacitor 7
+- **PWA**: Angular Service Worker
+- **Push**: Capacitor Push Notifications
 
 ---
 
@@ -47,19 +54,29 @@ cd app-gestion-turnos
 ### 2. Instalar dependencias
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
-### 3. Configurar Supabase
+### 3. Configurar variables de entorno
 
-1. Crear proyecto en [Supabase Dashboard](https://app.supabase.com)
-2. Copiar las credenciales (URL y Anon Key)
-3. Actualizar `src/app/supabase.ts`:
+1. Copiar el archivo de ejemplo:
+```bash
+cp .env.example .env
+```
+
+2. Editar `src/environments/environment.ts` y `src/environments/environment.prod.ts`:
 
 ```typescript
-const supabaseUrl = 'TU_SUPABASE_URL';
-const supabaseKey = 'TU_SUPABASE_ANON_KEY';
+export const environment = {
+  production: false,
+  supabase: {
+    url: 'TU_SUPABASE_URL',
+    anonKey: 'TU_SUPABASE_ANON_KEY'
+  }
+};
 ```
+
+⚠️ **IMPORTANTE**: Nunca commitear las credenciales reales. El archivo `.env.example` muestra el formato.
 
 ### 4. Crear las tablas en Supabase
 

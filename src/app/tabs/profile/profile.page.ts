@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { supabase } from '../../supabase';
 import { Router } from '@angular/router';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-profile',
@@ -41,7 +42,11 @@ export class ProfilePage implements OnInit {
 
   userId: string | null = null;
 
-  constructor(private router: Router, private toastCtrl: ToastController) {}
+  constructor(
+    private router: Router, 
+    private toastCtrl: ToastController,
+    public themeService: ThemeService
+  ) {}
 
   async ngOnInit() {
     try {

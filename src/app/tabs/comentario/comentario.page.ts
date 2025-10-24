@@ -21,6 +21,7 @@ import {
   IonListHeader,
   IonButtons,
   IonSpinner,
+  IonSearchbar,
   AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -32,6 +33,7 @@ import {
   trashOutline
 } from 'ionicons/icons';
 import { DatabaseService } from '../../services/database';
+import { AnalyticsService } from '../../services/analytics.service';
 
 interface Comentario {
   id_comentario?: number;
@@ -68,17 +70,24 @@ interface Comentario {
     IonList,
     IonListHeader,
     IonButtons,
-    IonSpinner
+    IonSpinner,
+    IonSearchbar
   ]
 })
 export class ComentarioPage implements OnInit {
   comentarios: Comentario[] = [];
+  comentariosFiltrados: Comentario[] = [];
   nuevoComentario: Comentario = { comentario: '', descripcion: '', puntuacion: 5 };
   editando: Comentario | null = null;
   userId: string = '';
-  isLoading = false; // Estado de carga
+  isLoading = false;
+  searchTerm: string = '';
 
-  constructor(private db: DatabaseService, private alertCtrl: AlertController) {
+  constructor(
+    private db: DatabaseService, 
+    private alertCtrl: AlertController,
+    private analytics: AnalyticsService
+  ) {
     addIcons({
       addCircleOutline,
       saveOutline,
@@ -89,6 +98,7 @@ export class ComentarioPage implements OnInit {
   }
 
   async ngOnInit() {
+    this.analytics.trackPageView('comentarios', '/tabs/comentario');
     const user = await this.db.getUser();
     this.userId = user?.id || '';
     this.cargarComentarios();
@@ -98,6 +108,8 @@ export class ComentarioPage implements OnInit {
     this.isLoading = true;
     try {
       this.comentarios = await this.db.getAll('comentario', 'fecha_comentario', false);
+      this.comentariosFiltrados = [...this.comentarios];
+      this.filtrarComentarios();
     } catch (e) {
       console.error('Error al cargar comentarios', e);
     } finally {
@@ -105,14 +117,33 @@ export class ComentarioPage implements OnInit {
     }
   }
 
+  filtrarComentarios() {
+    if (!this.searchTerm || this.searchTerm.trim() === '') {
+      this.comentariosFiltrados = [...this.comentarios];
+    } else {
+      const term = this.searchTerm.toLowerCase();
+      this.comentariosFiltrados = this.comentarios.filter(c =>
+        c.comentario.toLowerCase().includes(term) ||
+        (c.descripcion && c.descripcion.toLowerCase().includes(term))
+      );
+    }
+  }
+
+  limpiarBusqueda() {
+    this.searchTerm = '';
+    this.filtrarComentarios();
+  }
+
   async guardarComentario() {
     if (!this.nuevoComentario.comentario?.trim()) return;
     try {
       await this.db.insert('comentario', { ...this.nuevoComentario, usuario_id: this.userId });
+      this.analytics.trackComentarioCreated(this.nuevoComentario.puntuacion || 5);
       this.nuevoComentario = { comentario: '', descripcion: '', puntuacion: 5 };
       this.cargarComentarios();
     } catch (e) {
       console.error('Error al guardar', e);
+      this.analytics.trackError('comentario_creation_error', String(e));
     }
   }
 
