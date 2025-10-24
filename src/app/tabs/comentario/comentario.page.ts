@@ -20,6 +20,7 @@ import {
   IonList,
   IonListHeader,
   IonButtons,
+  IonSpinner,
   AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -66,7 +67,8 @@ interface Comentario {
     IonIcon,
     IonList,
     IonListHeader,
-    IonButtons
+    IonButtons,
+    IonSpinner
   ]
 })
 export class ComentarioPage implements OnInit {
