@@ -1,0 +1,29 @@
+background-color: #f9f9f9; /* Light background */
+color: #333; /* Dark text color for contrast */
+border-right: 1px solid #ccc; /* Light gray border on the right */
+width: 250px; /* Fixed width for the side navigation */
+height: 100%; /* Full height */
+display: flex; /* Flexbox for layout */
+flex-direction: column; /* Vertical layout */
+padding: 20px; /* Padding around the content */
+box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+
+.nav-item {
+    display: flex; /* Flexbox for icon and label alignment */
+    align-items: center; /* Center items vertically */
+    padding: 10px; /* Padding for each item */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s; /* Smooth background transition */
+
+    &.active {
+        background-color: #e0e0e0; /* Highlight active item */
+    }
+
+    &:hover {
+        background-color: #d0d0d0; /* Change background on hover */
+    }
+
+    .icon {
+        margin-right: 10px; /* Space between icon and label */
+    }
+}
