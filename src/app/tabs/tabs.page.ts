@@ -9,8 +9,7 @@ import {
   IonTabs,
   IonTabBar,
   IonTabButton,
-  IonIcon,
-  IonLabel
+  IonIcon
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -24,8 +23,7 @@ import {
     IonTabs,
     IonTabBar,
     IonTabButton,
-    IonIcon,
-    IonLabel
+    IonIcon
   ]
 })
 

@@ -25,4 +25,3 @@ export class AppComponent implements OnInit {
     this.pushNotifications.initPushNotifications();
   }
 }
-
