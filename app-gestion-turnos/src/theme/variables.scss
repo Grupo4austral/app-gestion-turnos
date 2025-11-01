@@ -1,0 +1,31 @@
+$primary-color: #ffffff; // Color de fondo claro
+$secondary-color: #f0f0f0; // Color secundario para elementos
+$text-color: #333333; // Color del texto
+$border-color: #cccccc; // Color de los bordes
+$border-thickness: 1px; // Grosor de los bordes
+
+// Estilos generales
+body {
+    background-color: $primary-color;
+    color: $text-color;
+    font-family: 'Arial', sans-serif;
+}
+
+.navbar {
+    background-color: $secondary-color;
+    border-right: $border-thickness solid $border-color;
+}
+
+.side-nav {
+    background-color: $secondary-color;
+    border-right: $border-thickness solid $border-color;
+}
+
+.side-nav .nav-item {
+    padding: 10px;
+    color: $text-color;
+}
+
+.side-nav .nav-item:hover {
+    background-color: lighten($secondary-color, 10%);
+}

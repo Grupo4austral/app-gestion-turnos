@@ -1,8 +1,9 @@
   import { Component, OnInit } from '@angular/core';
   import { CommonModule } from '@angular/common';
   import { FormsModule } from '@angular/forms';
-  import { IonicModule } from '@ionic/angular';
+  import { IonicModule, ToastController } from '@ionic/angular';
   import { supabase } from '../../supabase';
+  import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
   selector: 'app-health',
@@ -17,6 +18,7 @@ export class HealthPage implements OnInit {
   servicios: any[] = [];
   prestadores: any[] = [];
   sucursales: any[] = [];
+  isLoading = false; // Estado de carga
 
   nuevoTurno: any = {
     usuario_id: '',
@@ -29,17 +31,24 @@ export class HealthPage implements OnInit {
     notas: ''
   };
 
-  constructor() {}
+  constructor(
+    private toastCtrl: ToastController,
+    private analytics: AnalyticsService
+  ) {}
 
   async ngOnInit() {
+    this.analytics.trackPageView('health', '/tabs/health');
     await this.cargarUsuario();
     await this.cargarListas();
     await this.cargarTurnos();
   }
 
   async cargarUsuario() {
-    // Asignamos manualmente el ID del usuario creado en la tabla "usuario"
-    this.nuevoTurno.usuario_id = '6f6fed94-960f-4350-b961-d27b3f70be1f';
+    // Obtener el usuario autenticado dinámicamente
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      this.nuevoTurno.usuario_id = user.id;
+    }
   }
 
   async cargarListas() {
@@ -72,42 +81,49 @@ export class HealthPage implements OnInit {
   }
 
   async cargarTurnos() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    this.isLoading = true;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const { data, error } = await supabase
-      .from('turno')
-      .select(`
-        id_turno,
-        inicio,
-        estado,
-        notas,
-        servicio:servicio(id_servicio, nombre),
-        prestador:prestador(id_prestador, nombre),
-        sucursal:sucursal(id_sucursal, nombre)
-      `)
-      .eq('usuario_id', user.id)
-      .order('inicio', { ascending: true });
+      const { data, error } = await supabase
+        .from('turno')
+        .select(`
+          id_turno,
+          inicio,
+          estado,
+          notas,
+          servicio:servicio(id_servicio, nombre),
+          prestador:prestador(id_prestador, nombre),
+          sucursal:sucursal(id_sucursal, nombre)
+        `)
+        .eq('usuario_id', user.id)
+        .order('inicio', { ascending: true });
 
-    if (!error && data) {
-      this.turnos = data.map((t: any) => ({
-        ...t,
-        servicio_nombre: t.servicio?.nombre || 'Sin servicio',
-        prestador_nombre: t.prestador?.nombre || 'Sin profesional',
-        sucursal_nombre: t.sucursal?.nombre || 'Sin sucursal'
-      }));
+      if (!error && data) {
+        this.turnos = data.map((t: any) => ({
+          ...t,
+          servicio_nombre: t.servicio?.nombre || 'Sin servicio',
+          prestador_nombre: t.prestador?.nombre || 'Sin profesional',
+          sucursal_nombre: t.sucursal?.nombre || 'Sin sucursal'
+        }));
+      }
+    } catch (error) {
+      console.error('Error al cargar turnos:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
   async agregarTurno() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      alert('Debes estar logueado para crear turnos.');
+      await this.mostrarToast('Debes estar logueado para crear turnos.', 'warning');
       return;
     }
 
     if (!this.nuevoTurno.id_servicio || !this.nuevoTurno.id_prestador || !this.nuevoTurno.inicio) {
-      alert('Por favor completá todos los campos obligatorios.');
+      await this.mostrarToast('Por favor completá todos los campos obligatorios.', 'warning');
       return;
     }
 
@@ -121,15 +137,15 @@ export class HealthPage implements OnInit {
       fin: finDate.toISOString(),
     };
 
-    console.log('Datos enviados a Supabase:', nuevoTurnoData); // 🧠 Debug
-
     const { error } = await supabase.from('turno').insert([nuevoTurnoData]);
 
     if (error) {
-      alert('Error al guardar el turno: ' + error.message);
+      await this.mostrarToast('Error al guardar el turno: ' + error.message, 'danger');
+      this.analytics.trackError('turno_creation_error', error.message);
       console.error(error);
     } else {
-      alert('Turno guardado con éxito ✅');
+      await this.mostrarToast('Turno guardado con éxito ✅', 'success');
+      this.analytics.trackTurnoCreated(nuevoTurnoData);
       this.nuevoTurno = {
         usuario_id: user.id,
         id_servicio: null,
@@ -142,5 +158,15 @@ export class HealthPage implements OnInit {
       };
       await this.cargarTurnos();
     }
+  }
+
+  async mostrarToast(mensaje: string, color: 'success' | 'danger' | 'warning' = 'success') {
+    const toast = await this.toastCtrl.create({
+      message: mensaje,
+      duration: 3000,
+      position: 'top',
+      color: color
+    });
+    await toast.present();
   }
 }

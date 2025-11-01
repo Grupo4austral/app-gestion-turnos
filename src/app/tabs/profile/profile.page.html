@@ -59,6 +59,16 @@
             placeholder="Ciudad o zona"
           ></ion-input>
         </ion-item>
+
+        <!-- Toggle de Dark Mode -->
+        <ion-item lines="none">
+          <ion-icon name="moon" slot="start"></ion-icon>
+          <ion-label>Modo Oscuro</ion-label>
+          <ion-toggle 
+            [checked]="themeService.isDarkMode()" 
+            (ionChange)="themeService.toggleDarkMode()"
+          ></ion-toggle>
+        </ion-item>
       </div>
 
       <div class="button-group">
