@@ -73,8 +73,10 @@ export class ComentarioPage implements OnInit, OnDestroy {
   comentarios: Comentario[] = [];
   comentariosFiltrados: Comentario[] = [];
   nuevoComentario: Partial<Comentario> = { 
+    comentario: '',
     titulo: '', 
     descripcion: '', 
+    puntuacion: 5,
     categoria: 'general',
     prioridad: 'media',
     estado: 'pendiente'
@@ -158,8 +160,8 @@ export class ComentarioPage implements OnInit, OnDestroy {
   }
 
   async guardarComentario() {
-    if (!this.nuevoComentario.titulo?.trim()) {
-      await this.mostrarToast('El título es requerido', 'warning');
+    if (!this.nuevoComentario.comentario?.trim() && !this.nuevoComentario.titulo?.trim()) {
+      await this.mostrarToast('El comentario es requerido', 'warning');
       return;
     }
 
@@ -177,8 +179,10 @@ export class ComentarioPage implements OnInit, OnDestroy {
       });
       
       this.nuevoComentario = { 
+        comentario: '',
         titulo: '', 
-        descripcion: '', 
+        descripcion: '',
+        puntuacion: 5,
         categoria: 'general',
         prioridad: 'media',
         estado: 'pendiente'
@@ -204,7 +208,8 @@ export class ComentarioPage implements OnInit, OnDestroy {
   }
 
   async actualizarComentario() {
-    if (!this.editando?.id) {
+    const updateId = this.editando?.id || this.editando?.id_comentario;
+    if (!updateId) {
       await this.mostrarToast('No hay comentario para actualizar', 'warning');
       return;
     }
@@ -213,10 +218,12 @@ export class ComentarioPage implements OnInit, OnDestroy {
     try {
       await this.db.update<Comentario>(
         'comentario',
-        this.editando.id,
+        updateId,
         {
+          comentario: this.editando.comentario,
           titulo: this.editando.titulo,
           descripcion: this.editando.descripcion,
+          puntuacion: this.editando.puntuacion,
           categoria: this.editando.categoria,
           prioridad: this.editando.prioridad,
           estado: this.editando.estado,
@@ -224,7 +231,7 @@ export class ComentarioPage implements OnInit, OnDestroy {
         }
       );
       
-      this.analytics.logEvent('comentario_actualizado', { id: this.editando.id });
+      this.analytics.logEvent('comentario_actualizado', { id: updateId });
       await this.mostrarToast('Comentario actualizado', 'success');
       this.editando = null;
       await this.cargarComentarios();

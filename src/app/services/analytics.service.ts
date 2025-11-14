@@ -62,6 +62,11 @@ export class AnalyticsService {
     await this.trackEvent('comentario_created', comentarioData);
   }
 
+  // Alias para compatibilidad
+  async logEvent(eventName: string, eventData?: any) {
+    await this.trackEvent(eventName, eventData);
+  }
+
   async trackServicioCreated(servicioData: any) {
     await this.trackEvent('servicio_created', servicioData);
   }
