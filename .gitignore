@@ -11,7 +11,12 @@ $RECYCLE.BIN/
 
 *.log
 log.txt
+build-error.log
 
+# Environment variables
+.env
+.env.local
+.env.*.local
 
 /.sourcemaps
 /.versions
