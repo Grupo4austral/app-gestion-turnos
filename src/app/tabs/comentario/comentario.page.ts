@@ -220,13 +220,13 @@ export class ComentarioPage implements OnInit, OnDestroy {
         'comentario',
         updateId,
         {
-          comentario: this.editando.comentario,
-          titulo: this.editando.titulo,
-          descripcion: this.editando.descripcion,
-          puntuacion: this.editando.puntuacion,
-          categoria: this.editando.categoria,
-          prioridad: this.editando.prioridad,
-          estado: this.editando.estado,
+          comentario: this.editando?.comentario,
+          titulo: this.editando?.titulo,
+          descripcion: this.editando?.descripcion,
+          puntuacion: this.editando?.puntuacion,
+          categoria: this.editando?.categoria,
+          prioridad: this.editando?.prioridad,
+          estado: this.editando?.estado,
           fecha_actualizacion: new Date().toISOString()
         }
       );
