@@ -1,13 +1,43 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>stats</ion-title>
+    <ion-title>Editar turno</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">stats</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="editar-background">
+
+  <div class="contenedor">
+
+    <h2 class="servicio">{{ servicio }}</h2>
+    <p class="prestador">Con {{ prestador }}</p>
+
+    <!-- Fecha -->
+    <ion-item class="item-custom">
+      <ion-label>Fecha</ion-label>
+      <ion-input type="date" [(ngModel)]="fecha"></ion-input>
+    </ion-item>
+
+    <!-- Hora -->
+    <ion-item class="item-custom">
+      <ion-label>Hora</ion-label>
+      <ion-input type="time" [(ngModel)]="hora"></ion-input>
+    </ion-item>
+
+    <!-- Estado -->
+    <ion-item class="item-custom">
+      <ion-label>Estado</ion-label>
+      <ion-chip color="primary">
+        {{ estado | titlecase }}
+      </ion-chip>
+    </ion-item>
+
+    <ion-button expand="block" class="btn-guardar" (click)="guardarCambios()">
+      Guardar cambios
+    </ion-button>
+
+  </div>
+
 </ion-content>

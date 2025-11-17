@@ -15,12 +15,12 @@ export const routes: Routes = [
     loadComponent: () => import('./tabs/tabs.page').then(m => m.TabsPage),
     children: [
       {
-        path: 'health',
-        loadComponent: () => import('./tabs/health/health.page').then(m => m.HealthPage)
+        path: 'home',
+        loadComponent: () => import('./tabs/home/home.page').then(m => m.HomePage)
       },
       {
-        path: 'capture',
-        loadComponent: () => import('./tabs/capture/capture.page').then(m => m.CapturePage)
+        path: 'health',
+        loadComponent: () => import('./tabs/health/health.page').then(m => m.HealthPage)
       },
       {
         path: 'stats',
@@ -36,7 +36,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'health',
+        redirectTo: 'home',
         pathMatch: 'full'
       }
     ]

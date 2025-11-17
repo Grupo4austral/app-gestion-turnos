@@ -1,68 +1,268 @@
+/* ===== TIPOGRAFÍA ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: 0.2px;
+}
+
+/* ===== FONDO GENERAL ===== */
 .home-background {
-  --background: linear-gradient(180deg, #1e2a3a 0%, #1e2a3a 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  --background: transparent!important;
+  background: linear-gradient(180deg, #0D1B2A, #1F3A57);
+  position: relative;
 }
 
-.home-container {
-  text-align: center;
-  padding: 20px;
-}
-
-.home-title {
-  color: #fff;
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.service-card {
-  background: rgba(195, 195, 195, 0.373);
-  border-radius: 15px;
-  text-align: center;
-  transition: 0.3s;
-  padding: 20px;
+/* ===== VIGNETTE DIFUSA ===== */
+/* OVERLAY QUE CUBRE TODO EL SCROLL Y NUNCA SE CORTA */
+.overlay {
+  position: fixed !important;   /* Cubre toda la pantalla SIEMPRE */
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 500px;      
-  height: 250px;        
-  margin: 0 auto 20px auto;  
+  height: 100%;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.05), rgba(0,0,0,0.4));
+  z-index: 1;
+  pointer-events: none;
+}
+
+ion-content::part(scroll) {
+  padding-bottom: 140px !important;
+}
+
+/* ===== HEADER FIX ===== */
+ion-header,
+ion-toolbar {
+  --background: #1F3A57 !important;
+  background: #1F3A57 !important;
+  --ion-background-color: transparent !important;
+
+  --border-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  color: #ffffff !important;
+  padding-left: 16px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+/* FIX EXTRA — iOS mete color en el container */
+ion-header::part(container),
+ion-toolbar::part(container) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+/* ===== CONTENIDO ===== */
+.contenido {
+  z-index: 2;
+  padding-bottom: 120px;
+}
+
+/* ===== BIENVENIDA ===== */
+.bienvenida {
+  padding: 28px;
+  color: #ffffff;
+
+  h1 {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+  }
+
+  p {
+    font-size: 15px;
+    opacity: 0.75;
+    margin: 0;
+  }
+}
+
+/* ===== TARJETAS BASE ===== */
+.tarjeta {
+  margin: 20px;
+  padding: 26px;
+  border-radius: 24px;
+  background: rgba(111,168,199,0.12);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+  color:  #F4F7FB;
+  animation: fadeIn .6s ease;
+}
+
+/* ===== TARJETA VACIA ===== */
+.vacio {
+  text-align: center;
+
+  ion-icon {
+    font-size: 64px;
+    opacity: 0.9;
+    color: #d9e7ff;
+    margin-bottom: 12px;
+  }
+
+  .titulo-vacio {
+    font-size: 22px;
+    font-weight: 600;
+    color: #e9f1ff;
+  }
+
+  .sub-vacio {
+    opacity: 0.7;
+    font-size: 15px;
+    color: #cbd9ff;
+  }
+}
+
+/* ===== TURNOS ===== */
+.titulo-servicio {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+/* INFORMACIÓN */
+.info-row {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
-.service-card:hover {
-  transform: scale(1.05);
-  background: rgba(223, 219, 219, 0.34);
+.info-row ion-icon {
+  font-size: 19px;
+  opacity: 0.85;
 }
 
-
-.service-icon {
-  font-size: 40px;
-  color: #187794;
-  margin-bottom: 10px;
+/* ===== ESTADOS DE TURNO ===== */
+.estado {
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  width: fit-content;
+  margin-top: 14px;
 }
 
-.service-name {
-  color: #fff;
-  font-size: 16px;
+.estado.confirmado {
+  background: rgba(46, 204, 113, 0.18);
+  color: #7ef2b3;
+}
+
+.estado.pendiente {
+  background: rgba(241, 196, 15, 0.25);
+  color: #f9e795;
+}
+
+.estado.modificado {
+  background: rgba(52, 152, 219, 0.2);
+  color: #9ccfff;
+}
+
+.estado.cancelado {
+  background: rgba(231, 76, 60, 0.22);
+  border: 1px solid rgba(255, 110, 110, 0.35);
+  color: #ffb8b8;
+}
+
+/* ===== ACCIONES ===== */
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+
+  ion-button {
+    --border-radius: 12px;
+    font-weight: 600;
+  }
+}
+
+/* ===== HISTORIAL ===== */
+.historial-item {
+  opacity: 0.9;
+
+  .estado {
+    margin-top: 10px;
+  }
+}
+
+/* ===== TITULOS SECUNDARIOS ===== */
+.subtitulo {
+  margin-left: 25px;
+  margin-top: 12px;
+  color: #e1e8ff;
+  opacity: 0.85;
+  font-size: 17px;
   font-weight: 500;
 }
 
-
-.service-image {
-  width: 50%;               
-  max-width: 100px;          
-  height: auto;              
-  object-fit: contain;      
-  border-radius: 5px;
-  margin-bottom: 5px;
-  transition: transform 0.3s ease;
+/* ===== FAB ===== */
+ion-fab {
+  right: 22px !important;
+  bottom: 25px !important;
 }
 
+.boton-pro {
+  --background: #4DB6AC;
+  --background-activated: #3A928A;
+  --border-radius: 50px;
+  height: 55px;
+  padding: 0 32px;
+  font-size: 17px;
+  color: #F4F7FB;
+  font-weight: 700;
 
-.service-card:hover .service-image {
-  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.40);
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ==== ELIMINA EL CUADRADO FEO DEL FAB ==== */
+
+/* Remueve fondo del contenedor DEL FAB */
+ion-fab::part(container) {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Remueve fondos que Ionic mete adentro */
+ion-fab-button,
+ion-fab-button::part(native) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Hace que el FAB NO genere fondo ni blur al ponerse encima */
+ion-fab {
+  --background: transparent !important;
+  --box-shadow: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Asegura que NO aparezca el cuadrado detrás */
+ion-fab::part(fab) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* REMATE: limpia cualquier overlay oculto */
+ion-fab * {
+  background: transparent !important;
+  box-shadow: none !important;
 }

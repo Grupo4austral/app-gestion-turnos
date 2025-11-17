@@ -1,0 +1,38 @@
+.editar-background {
+  --background: #0D1B2A;
+  background: #0D1B2A;
+  color: white;
+}
+
+.contenedor {
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.servicio {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.prestador {
+  font-size: 15px;
+  opacity: 0.8;
+  margin-bottom: 25px;
+}
+
+.item-custom {
+  --background: rgba(255,255,255,0.08);
+  border-radius: 15px;
+  margin-bottom: 15px;
+  backdrop-filter: blur(12px);
+}
+
+.btn-guardar {
+  margin-top: 25px;
+  --background: #046865;
+  --border-radius: 12px;
+  height: 50px;
+  font-size: 17px;
+  font-weight: bold;
+}
