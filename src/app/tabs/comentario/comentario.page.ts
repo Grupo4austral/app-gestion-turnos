@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -22,7 +22,8 @@ import {
   IonButtons,
   IonSpinner,
   IonSearchbar,
-  AlertController
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -34,15 +35,9 @@ import {
 } from 'ionicons/icons';
 import { DatabaseService } from '../../services/database';
 import { AnalyticsService } from '../../services/analytics.service';
-
-interface Comentario {
-  id_comentario?: number;
-  comentario: string;
-  descripcion?: string;
-  fecha_comentario?: string;
-  puntuacion?: number;
-  usuario_id?: string;
-}
+import { Comentario } from '../../models';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-comentario',
@@ -74,19 +69,30 @@ interface Comentario {
     IonSearchbar
   ]
 })
-export class ComentarioPage implements OnInit {
+export class ComentarioPage implements OnInit, OnDestroy {
   comentarios: Comentario[] = [];
   comentariosFiltrados: Comentario[] = [];
-  nuevoComentario: Comentario = { comentario: '', descripcion: '', puntuacion: 5 };
+  nuevoComentario: Partial<Comentario> = { 
+    comentario: '',
+    titulo: '', 
+    descripcion: '', 
+    puntuacion: 5,
+    categoria: 'general',
+    prioridad: 'media',
+    estado: 'pendiente'
+  };
   editando: Comentario | null = null;
   userId: string = '';
   isLoading = false;
   searchTerm: string = '';
+  
+  private destroy$ = new Subject<void>();
 
   constructor(
     private db: DatabaseService, 
     private alertCtrl: AlertController,
-    private analytics: AnalyticsService
+    private analytics: AnalyticsService,
+    private toastController: ToastController
   ) {
     addIcons({
       addCircleOutline,
@@ -99,19 +105,38 @@ export class ComentarioPage implements OnInit {
 
   async ngOnInit() {
     this.analytics.trackPageView('comentarios', '/tabs/comentario');
-    const user = await this.db.getUser();
-    this.userId = user?.id || '';
-    this.cargarComentarios();
+    
+    // Suscribirse al usuario actual
+    this.db.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.userId = user?.id || '';
+      });
+    
+    await this.cargarComentarios();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   async cargarComentarios() {
     this.isLoading = true;
     try {
-      this.comentarios = await this.db.getAll('comentario', 'fecha_comentario', false);
+      this.comentarios = await this.db.getAll<Comentario>('comentario', {
+        orderBy: 'fecha_creacion',
+        ascending: false
+      });
       this.comentariosFiltrados = [...this.comentarios];
       this.filtrarComentarios();
-    } catch (e) {
-      console.error('Error al cargar comentarios', e);
+      
+      this.analytics.logEvent('comentarios_cargados', {
+        cantidad: this.comentarios.length
+      });
+    } catch (error) {
+      console.error('Error al cargar comentarios', error);
+      await this.mostrarToast('Error al cargar comentarios', 'danger');
     } finally {
       this.isLoading = false;
     }
@@ -123,7 +148,7 @@ export class ComentarioPage implements OnInit {
     } else {
       const term = this.searchTerm.toLowerCase();
       this.comentariosFiltrados = this.comentarios.filter(c =>
-        c.comentario.toLowerCase().includes(term) ||
+        c.titulo?.toLowerCase().includes(term) ||
         (c.descripcion && c.descripcion.toLowerCase().includes(term))
       );
     }
@@ -135,15 +160,42 @@ export class ComentarioPage implements OnInit {
   }
 
   async guardarComentario() {
-    if (!this.nuevoComentario.comentario?.trim()) return;
+    if (!this.nuevoComentario.comentario?.trim() && !this.nuevoComentario.titulo?.trim()) {
+      await this.mostrarToast('El comentario es requerido', 'warning');
+      return;
+    }
+
+    this.isLoading = true;
     try {
-      await this.db.insert('comentario', { ...this.nuevoComentario, usuario_id: this.userId });
-      this.analytics.trackComentarioCreated(this.nuevoComentario.puntuacion || 5);
-      this.nuevoComentario = { comentario: '', descripcion: '', puntuacion: 5 };
-      this.cargarComentarios();
-    } catch (e) {
-      console.error('Error al guardar', e);
-      this.analytics.trackError('comentario_creation_error', String(e));
+      await this.db.insert<Comentario>('comentario', {
+        ...this.nuevoComentario as Comentario,
+        usuario_id: this.userId,
+        fecha_creacion: new Date().toISOString()
+      });
+      
+      this.analytics.trackComentarioCreated(5);
+      this.analytics.logEvent('comentario_creado', {
+        categoria: this.nuevoComentario.categoria
+      });
+      
+      this.nuevoComentario = { 
+        comentario: '',
+        titulo: '', 
+        descripcion: '',
+        puntuacion: 5,
+        categoria: 'general',
+        prioridad: 'media',
+        estado: 'pendiente'
+      };
+      
+      await this.mostrarToast('Comentario creado exitosamente', 'success');
+      await this.cargarComentarios();
+    } catch (error) {
+      console.error('Error al guardar', error);
+      this.analytics.trackError('comentario_creation_error', String(error));
+      await this.mostrarToast('Error al guardar comentario', 'danger');
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -151,27 +203,49 @@ export class ComentarioPage implements OnInit {
     this.editando = { ...c };
   }
 
+  cancelarEdicion() {
+    this.editando = null;
+  }
+
   async actualizarComentario() {
-    if (!this.editando?.id_comentario) return;
+    const updateId = this.editando?.id || this.editando?.id_comentario;
+    if (!updateId) {
+      await this.mostrarToast('No hay comentario para actualizar', 'warning');
+      return;
+    }
+
+    this.isLoading = true;
     try {
-      await this.db.update(
+      await this.db.update<Comentario>(
         'comentario',
-        this.editando.id_comentario,
+        updateId,
         {
-          comentario: this.editando.comentario,
-          descripcion: this.editando.descripcion,
-          puntuacion: this.editando.puntuacion,
-        },
-        'id_comentario' // PK real de la tabla
+          comentario: this.editando?.comentario,
+          titulo: this.editando?.titulo,
+          descripcion: this.editando?.descripcion,
+          puntuacion: this.editando?.puntuacion,
+          categoria: this.editando?.categoria,
+          prioridad: this.editando?.prioridad,
+          estado: this.editando?.estado,
+          fecha_actualizacion: new Date().toISOString()
+        }
       );
+      
+      this.analytics.logEvent('comentario_actualizado', { id: updateId });
+      await this.mostrarToast('Comentario actualizado', 'success');
       this.editando = null;
-      this.cargarComentarios();
-    } catch (e) {
-      console.error('Error al actualizar', e);
+      await this.cargarComentarios();
+    } catch (error) {
+      console.error('Error al actualizar', error);
+      await this.mostrarToast('Error al actualizar comentario', 'danger');
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  async eliminarComentario(id: number) {
+  async eliminarComentario(id?: number) {
+    if (!id) return;
+
     const alert = await this.alertCtrl.create({
       header: 'Confirmar',
       message: '¿Deseás eliminar este comentario?',
@@ -179,18 +253,53 @@ export class ComentarioPage implements OnInit {
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
+          role: 'destructive',
           handler: async () => {
+            this.isLoading = true;
             try {
-              await this.db.delete('comentario', id, 'id_comentario');
-              this.cargarComentarios();
-            } catch (e) {
-              console.error('Error al eliminar', e);
+              await this.db.delete('comentario', id);
+              this.analytics.logEvent('comentario_eliminado', { id });
+              await this.mostrarToast('Comentario eliminado', 'success');
+              await this.cargarComentarios();
+            } catch (error) {
+              console.error('Error al eliminar', error);
+              await this.mostrarToast('Error al eliminar comentario', 'danger');
+            } finally {
+              this.isLoading = false;
             }
           },
         },
       ],
     });
     await alert.present();
+  }
+
+  private async mostrarToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom',
+    });
+    await toast.present();
+  }
+
+  getPrioridadColor(prioridad?: string): string {
+    switch (prioridad) {
+      case 'alta': return 'danger';
+      case 'media': return 'warning';
+      case 'baja': return 'success';
+      default: return 'medium';
+    }
+  }
+
+  getEstadoColor(estado?: string): string {
+    switch (estado) {
+      case 'completado': return 'success';
+      case 'en_proceso': return 'warning';
+      case 'pendiente': return 'medium';
+      default: return 'medium';
+    }
   }
 }
 

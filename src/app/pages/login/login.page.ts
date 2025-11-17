@@ -37,10 +37,11 @@ export class LoginPage implements OnInit {
     const { data, error } = await this.auth.login(this.email, this.password);
 
     if (error) {
-      this.errorMessage = error.message;
+      const errorMsg = (error as any)?.message || 'Error desconocido';
+      this.errorMessage = errorMsg;
       console.error(error);
-      this.analytics.trackError('login_error', error.message);
-    } else {
+      this.analytics.trackError('login_error', errorMsg);
+    } else if (data) {
       this.analytics.trackLogin(data.user?.id || 'unknown');
       this.router.navigateByUrl('/tabs');
     }
