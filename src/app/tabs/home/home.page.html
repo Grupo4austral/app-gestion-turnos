@@ -1,6 +1,6 @@
 <ion-header>
-  <ion-toolbar color="transparent">
-    <ion-title class="titulo-header">Home</ion-title>
+  <ion-toolbar>
+    <ion-title>Inicio</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -10,12 +10,13 @@
 
   <div class="contenido">
 
+    <!-- BIENVENIDA -->
     <div class="bienvenida">
-      <h1>Hola {{ nombreUsuario }} </h1>
-      <p>Revisá tus próximos turnos</p>
+      <h1>Hola {{ nombreUsuario }}</h1>
+      <p class="subtitulo-principal">Revisá tus próximos turnos</p>
     </div>
 
-    <!-- SIN TURNOS ACTIVOS -->
+    <!-- SIN TURNOS -->
     <div *ngIf="proximoTurno === null" class="tarjeta vacio fade-in">
       <ion-icon name="calendar-clear-outline"></ion-icon>
       <p class="titulo-vacio">No tenés turnos próximos</p>
@@ -23,31 +24,42 @@
     </div>
 
     <!-- PRÓXIMO TURNO -->
-    <div *ngIf="proximoTurno" class="tarjeta turno-principal fade-in">
+    <div *ngIf="proximoTurno" class="tarjeta turno fade-in">
 
-      <h2 class="titulo-servicio">{{ proximoTurno.servicio }}</h2>
+      <div class="header-turno">
+        <h2 class="titulo-servicio">{{ proximoTurno.servicio }}</h2>
 
-      <div class="info-row">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <p>{{ proximoTurno.inicio | date:'EEEE d MMMM - HH:mm' }}</p>
+        <div class="estado" [ngClass]="proximoTurno.estado">
+          {{ proximoTurno.estado | titlecase }}
+        </div>
       </div>
 
+      <!-- FECHA -->
+      <div class="info-row">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <p>{{ proximoTurno.inicio | date:'EEEE d MMMM • HH:mm':'':'es-AR' }}</p>
+      </div>
+
+      <!-- PROFESIONAL -->
       <div class="info-row">
         <ion-icon name="person-circle-outline"></ion-icon>
         <p>{{ proximoTurno.prestador }}</p>
       </div>
 
-      <div class="estado" [ngClass]="proximoTurno.estado">
-        {{ proximoTurno.estado | titlecase }}
+      <!-- UBICACIÓN -->
+      <div class="info-row ubicacion">
+        <ion-icon name="location-outline"></ion-icon>
+
+        <p class="ubicacion-texto"
+           (click)="abrirMapa(proximoTurno.sucursal_direccion)">
+          {{ proximoTurno.sucursal }} — {{ proximoTurno.sucursal_direccion }}
+        </p>
       </div>
 
-      <div class="acciones" *ngIf="proximoTurno.estado !== 'cancelado'">
-        <ion-button size="small" fill="outline" (click)="editarTurno(proximoTurno)">Editar</ion-button>
-        <ion-button size="small" color="danger" fill="outline" (click)="cancelarTurno(proximoTurno)">Cancelar</ion-button>
-      </div>
-
-      <div class="estado-cancelado" *ngIf="proximoTurno.estado === 'cancelado'">
-        Cancelado
+      <!-- ACCIONES -->
+      <div class="acciones">
+        <ion-button fill="clear" class="btn-modificar" (click)="editarTurno(proximoTurno)">Modificar</ion-button>
+        <ion-button fill="clear" class="btn-cancelar" (click)="cancelarTurno(proximoTurno)">Cancelar</ion-button>
       </div>
 
     </div>
@@ -55,22 +67,32 @@
     <!-- OTROS TURNOS -->
     <h3 *ngIf="turnosFuturos.length > 0" class="subtitulo">Otros turnos</h3>
 
-    <div *ngFor="let t of turnosFuturos" class="tarjeta turno-item fade-in">
+    <div *ngFor="let t of turnosFuturos" class="tarjeta turno fade-in">
 
-      <h2>{{ t.servicio }}</h2>
+      <div class="header-turno">
+        <h2>{{ t.servicio }}</h2>
+        <div class="estado" [ngClass]="t.estado">
+          {{ t.estado | titlecase }}
+        </div>
+      </div>
 
       <div class="info-row">
         <ion-icon name="calendar-outline"></ion-icon>
-        <p>{{ t.inicio | date:'d/MM HH:mm' }}</p>
+        <p>{{ t.inicio | date:'EEEE d MMMM • HH:mm':'':'es-AR' }}</p>
       </div>
 
-      <div class="estado" [ngClass]="t.estado">
-        {{ t.estado | titlecase }}
+      <div class="info-row ubicacion">
+        <ion-icon name="location-outline"></ion-icon>
+
+        <p class="ubicacion-texto"
+           (click)="abrirMapa(t.sucursal_direccion)">
+          {{ t.sucursal }} — {{ t.sucursal_direccion }}
+        </p>
       </div>
 
-      <div class="acciones" *ngIf="t.estado !== 'cancelado'">
-        <ion-button size="small" fill="outline" (click)="editarTurno(t)">Editar</ion-button>
-        <ion-button size="small" color="danger" fill="outline" (click)="cancelarTurno(t)">Cancelar</ion-button>
+      <div class="acciones">
+        <ion-button fill="clear" class="btn-modificar" (click)="editarTurno(t)">Modificar</ion-button>
+        <ion-button fill="clear" class="btn-cancelar" (click)="cancelarTurno(t)">Cancelar</ion-button>
       </div>
 
     </div>
@@ -78,24 +100,44 @@
     <!-- HISTORIAL -->
     <h3 *ngIf="historial.length > 0" class="subtitulo">Historial</h3>
 
-    <div *ngFor="let h of historial" class="tarjeta historial-item fade-in">
+    <div *ngFor="let h of historial" class="tarjeta turno fade-in">
 
-      <h2>{{ h.servicio }}</h2>
+      <div class="header-turno">
+        <h2>{{ h.servicio }}</h2>
 
-      <div class="info-row">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <p>{{ h.inicio | date:'d/MM HH:mm' }}</p>
+        <div class="estado" [ngClass]="h.estado">
+         {{ h.estado | titlecase }}
+       </div>
+
       </div>
 
-      <div class="estado cancelado">
-        {{ h.estado === 'cancelado' ? 'Cancelado' : 'Asistido' }}
+      <!-- FECHA -->
+      <div class="info-row">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <p>{{ h.inicio | date:'EEEE d MMMM • HH:mm':'':'es-AR' }}</p>
+      </div>
+
+      <!-- PROFESIONAL -->
+      <div class="info-row">
+        <ion-icon name="person-circle-outline"></ion-icon>
+        <p>{{ h.prestador }}</p>
+      </div>
+
+      <!-- UBICACIÓN -->
+      <div class="info-row ubicacion">
+        <ion-icon name="location-outline"></ion-icon>
+
+        <p class="ubicacion-texto"
+           (click)="abrirMapa(h.sucursal_direccion)">
+          {{ h.sucursal }} — {{ h.sucursal_direccion }}
+        </p>
       </div>
 
     </div>
 
-  </div>
+  </div> 
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="fab-animado">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-button class="boton-pro" (click)="nuevoTurno()">SACAR TURNO</ion-button>
   </ion-fab>
 

@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
 
@@ -20,12 +19,11 @@ const supabase = createClient(
 })
 export class HomePage {
 
-  nombreUsuario: string = '';
-
+  nombreUsuario = '';
   turnosActivos: any[] = [];
   proximoTurno: any = null;
   turnosFuturos: any[] = [];
-  historial: any[] = [];  // ← HISTORIAL AQUÍ
+  historial: any[] = [];
 
   constructor(
     private router: Router,
@@ -37,7 +35,6 @@ export class HomePage {
     await this.cargarTurnos();
   }
 
-  // Cargar nombre
   async cargarUsuario() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) return;
@@ -51,51 +48,77 @@ export class HomePage {
     if (data) this.nombreUsuario = data.nombre_usuario;
   }
 
-  // Cargar turnos del usuario
-  async cargarTurnos() {
-    const { data, error } = await supabase
-      .from('v_turnos_detalle')
-      .select('*')
-      .order('inicio', { ascending: true });
+ async cargarTurnos() {
+  const { data, error } = await supabase
+    .from('v_turnos_detalle')
+    .select('*')
+    .order('inicio', { ascending: true });
 
-    if (error) return console.error(error);
+  if (error) return console.error(error);
 
-    // Separar turnos activos (pendiente/confirmado/modificado) y cancelados/asistidos
-    this.turnosActivos = data.filter(t =>
-      t.estado !== 'cancelado' && t.asistido !== true
-    );
+  const ahora = new Date();
 
-    this.historial = data.filter(t =>
-      t.estado === 'cancelado' || t.asistido === true
-    );
+  // =============== TURNOS ACTIVOS (futuros) ===============
+  this.turnosActivos = data.filter(t =>
+    t.estado !== 'c' &&                   // no cancelados
+    new Date(t.inicio) > ahora            // fecha futura
+  );
 
-    // SI NO HAY TURNOS ACTIVOS
-    if (this.turnosActivos.length === 0) {
-      this.proximoTurno = null;
-      this.turnosFuturos = [];
-      return;
+  // =============== HISTORIAL (pasados o cancelados) ===============
+this.historial = data
+  .filter(t =>
+    t.estado === 'c' ||               // cancelados abreviados
+    t.estado === 'cancelado' ||       // cancelados normales
+    new Date(t.inicio) <= ahora       // pasó la fecha
+  )
+  .map(t => {
+
+    const inicio = new Date(t.inicio);
+
+    // 1️⃣ Cancelado
+    if (t.estado === 'c' || t.estado === 'cancelado') {
+      return { ...t, estado: 'cancelado' };
     }
 
-    // Asignar próximo turno
-    this.proximoTurno = this.turnosActivos[0];
+    // 2️⃣ Pasó la fecha → Asistido SI O SI
+    if (inicio <= ahora) {
+      return { ...t, estado: 'asistido' };
+    }
 
-    // Turnos futuros excepto el primero
-    this.turnosFuturos = this.turnosActivos.slice(1);
+    // 3️⃣ Cualquier cosa rara → Confirmado
+    return { ...t, estado: 'confirmado' };
+  });
+
+
+  // =============== MANEJO DE PROXIMO / FUTUROS ===============
+  if (this.turnosActivos.length === 0) {
+    this.proximoTurno = null;
+    this.turnosFuturos = [];
+    return;
   }
 
-  // Editar turno
-  editarTurno(t: any) {
+  this.proximoTurno = this.turnosActivos[0];
+  this.turnosFuturos = this.turnosActivos.slice(1);
+}
+
+  editarTurno(turno: any) {
     this.router.navigate(['/tabs/stats'], {
-      queryParams: { id_turno: t.id_turno }
+      queryParams: { id_turno: turno.id_turno }
     });
   }
 
-  // Cancelar turno
   async cancelarTurno(t: any) {
+    const fecha = new Date(t.inicio).toLocaleString('es-AR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
     const alert = await this.alertCtrl.create({
       header: 'Cancelar turno',
-      message: `¿Seguro que querés cancelar este turno?<br><br><b>${t.servicio}</b><br>${t.inicio}`,
+      message: `¿Querés cancelar el turno de ${t.servicio}?${fecha}`,
       buttons: [
         { text: 'No', role: 'cancel' },
         {
@@ -117,7 +140,11 @@ export class HomePage {
     await alert.present();
   }
 
-  // Sacar turno
+  abrirMapa(direccion: string) {
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
+    window.open(url, '_blank');
+  }
+
   nuevoTurno() {
     this.router.navigate(['/tabs/health']);
   }
