@@ -1,68 +1,215 @@
+/* TIPOGRAFÍA */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: .2px;
+}
+
+/* FONDO */
 .home-background {
-  --background: linear-gradient(180deg, #1e2a3a 0%, #1e2a3a 100%);
+  --background: transparent!important;
+  background:
+    radial-gradient(circle at top left, #1e6f7f33 0%, transparent 40%),
+    radial-gradient(circle at bottom right, #113a4733 0%, transparent 55%),
+    linear-gradient(180deg, #0A1624 0%, #0E2135 100%);
+  position: relative;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(255,255,255,.05), rgba(0,0,0,.55));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* HEADER */
+ion-toolbar {
+  --background: rgba(12,29,48,.85);
+  backdrop-filter: blur(14px);
+  color: #E8EEF7 !important;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* CONTENIDO */
+.contenido {
+  padding-bottom: 120px;
+  z-index: 2;
+}
+
+/* BIENVENIDA */
+.bienvenida {
+  padding-left: 22px !important;
+  padding-right: 22px !important;
+  margin-bottom: 6px;
+}
+
+.bienvenida p {
+  margin-top: 0;
+}
+
+.bienvenida h1 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #F4F7FB;
+}
+
+.subtitulo-principal {
+  font-size: 18px;
+  opacity: .8;
+}
+
+/* TARJETAS */
+.tarjeta {
+  margin: 18px;
+  padding: 22px;
+  border-radius: 18px;
+  background: rgba(14,32,50,.55);
+  border: 1px solid rgba(255,255,255,.05);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.4);
+  color: #F4F7FB;
+}
+
+/* HEADER DE TURNO */
+.header-turno {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
-.home-container {
-  text-align: center;
-  padding: 20px;
+/* ESTADOS */
+.estado {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.home-title {
-  color: #fff;
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 20px;
+
+.estado.confirmado {
+  background: rgba(46,204,113,.20);
+  color: #7ef2b3;
 }
 
-.service-card {
-  background: rgba(195, 195, 195, 0.373);
-  border-radius: 15px;
-  text-align: center;
-  transition: 0.3s;
-  padding: 20px;
-  width: 100%;
-  max-width: 500px;      
-  height: 250px;        
-  margin: 0 auto 20px auto;  
+.estado.cancelado {
+  background: rgba(77, 29, 29, 0.978);
+  color: #f58b8b;
+}
+
+.estado.asistido {
+  background: rgba(90,140,255,.22);
+  color: #bcd6ff;
+}
+
+/* INFO */
+.info-row {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  gap: 12px;
+  margin-top: 8px;
 }
 
-.service-card:hover {
-  transform: scale(1.05);
-  background: rgba(223, 219, 219, 0.34);
+.info-row ion-icon {
+  font-size: 18px;
 }
 
 
-.service-icon {
-  font-size: 40px;
-  color: #187794;
-  margin-bottom: 10px;
+
+/* CONTENEDOR DE UBICACIÓN */
+.info-row.ubicacion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.service-name {
-  color: #fff;
+/* TEXTO CLICKEABLE SOLO HASTA DONDE LLEGA */
+.ubicacion-texto {
+  cursor: pointer;
+  color: #d9f1ff;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;  
+  width: fit-content;      
+}
+
+.ubicacion-texto:hover {
+  opacity: .6;
+}
+
+
+
+/* ACCIONES */
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 28px;
+  margin-top: 25px;
+}
+
+.acciones ion-button {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+/* TÍTULOS */
+.subtitulo {
+  margin-left: 22px;
+  margin-top: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #dfe8ff;
+}
+
+/* BOTÓN FAB */
+.boton-pro {
+  --background: #25675e;
+  --background-activated: #1f5d55;
+  --background-focused: #1f5d55;
+  --background-hover: #2f7f75;
+
+  height: 55px;
+  width: 200px;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+
+  border-radius: 999px !important; /* Redondea el ion-button */
+}
+
+/* NECESARIO PARA QUE EL REDONDEADO SE APLIQUE DE VERDAD */
+.boton-pro::part(native) {
+  border-radius: 999px !important; /* Redondea la parte interna REAL del botón */
+  padding-left: 22px;
+  padding-right: 22px;
 }
 
 
-.service-image {
-  width: 50%;               
-  max-width: 100px;          
-  height: auto;              
-  object-fit: contain;      
-  border-radius: 5px;
-  margin-bottom: 5px;
-  transition: transform 0.3s ease;
+/* BOTÓN MODIFICAR (fondo dorado) */
+.btn-modificar {
+  --background: #867544 !important;
+  --background-hover: #6d5c36 !important;
+  --background-activated: #5e512d !important;
+  --color: white !important;
+  padding: 6px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 16px;
 }
 
-
-.service-card:hover .service-image {
-  transform: scale(1.05);
+/* BOTÓN CANCELAR (fondo rojo) */
+.btn-cancelar {
+  --background: #800606ba !important;
+  --background-hover: #811c1c !important;
+  --background-activated: #541b1b !important;
+  --color: rgb(245, 206, 206) !important;
+  padding: 6px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 16px;
 }

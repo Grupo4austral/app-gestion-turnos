@@ -1,13 +1,78 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>stats</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Editar turno</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">stats</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="editar-background">
+
+  <div class="contenedor">
+
+    <!-- TÍTULO DEL SERVICIO -->
+    <h2 class="servicio">{{ servicio }}</h2>
+    <p class="prestador">Con {{ prestador }}</p>
+
+    <!-- FECHA (tocar toda la fila abre el selector) -->
+    <ion-item class="item-custom" (click)="focusFecha()">
+      <ion-label>Fecha</ion-label>
+      <ion-input
+        #fechaInput
+        type="date"
+        [(ngModel)]="fecha">
+      </ion-input>
+    </ion-item>
+
+    <!-- HORA (tocar toda la fila abre el selector) -->
+    <ion-item class="item-custom" (click)="focusHora()">
+      <ion-label>Hora</ion-label>
+      <ion-input
+        #horaInput
+        type="time"
+        [(ngModel)]="hora">
+      </ion-input>
+    </ion-item>
+
+    <!-- ESTADO (solo lectura, sin posibilidad de editar) -->
+    <ion-item class="item-custom item-estado">
+      <ion-label>Estado</ion-label>
+      <ion-chip class="chip-estado" [ngClass]="estado">
+        {{ estado | titlecase }}
+      </ion-chip>
+    </ion-item>
+
+    <!-- SUCURSAL (opcionalmente editable) -->
+    <ion-item class="item-custom">
+      <ion-label>Sucursal</ion-label>
+
+      <!-- Si hay más de una sucursal, permitimos elegir -->
+      <ion-select
+        *ngIf="sucursales.length > 1"
+        interface="popover"
+        [(ngModel)]="sucursalId">
+        <ion-select-option
+          *ngFor="let s of sucursales"
+          [value]="s.id_sucursal">
+          {{ s.nombre }} — {{ s.direccion }}
+        </ion-select-option>
+      </ion-select>
+
+      <!-- Si solo hay una sucursal, la mostramos en texto plano -->
+      <div class="sucursal-unica" *ngIf="sucursales.length <= 1">
+        {{ etiquetaSucursalActual() }}
+      </div>
+    </ion-item>
+
+    <!-- BOTÓN GUARDAR -->
+    <ion-button
+      expand="block"
+      class="btn-guardar"
+      (click)="guardarCambios()">
+      GUARDAR CAMBIOS
+    </ion-button>
+
+  </div>
+
 </ion-content>
