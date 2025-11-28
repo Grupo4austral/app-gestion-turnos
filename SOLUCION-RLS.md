@@ -1,12 +1,34 @@
 # 🔧 Solución de Errores RLS
 
-## 🚨 Errores que estabas viendo:
+## 🚨 Errores que estás viendo:
 ```
 ❌ Error al guardar cambios: new row violates row-level security policy for table "usuario"
 Error al guardar: Error desconocido
 ```
 
-## 📋 Solución paso a paso:
+---
+
+## ⚡ SOLUCIÓN RÁPIDA (Recomendada para desarrollo)
+
+### 1️⃣ Deshabilitar RLS temporalmente
+
+**Ve a Supabase Dashboard → SQL Editor y ejecuta:**
+
+```sql
+-- Deshabilitar RLS en ambas tablas
+ALTER TABLE public.usuario DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.comentario DISABLE ROW LEVEL SECURITY;
+```
+
+**O usa el archivo:** `disable-rls-temp.sql`
+
+✅ **Esto eliminará los errores inmediatamente**
+
+⚠️ **Nota:** Solo para desarrollo local. En producción debes habilitar RLS con políticas correctas.
+
+---
+
+## 📋 Solución paso a paso (Alternativa con políticas):
 
 ### 1️⃣ Crear/Verificar la tabla `usuario`
 
