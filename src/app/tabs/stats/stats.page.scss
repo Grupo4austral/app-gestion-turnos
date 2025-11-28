@@ -1,90 +1,57 @@
 .editar-background {
   --background: #0D1B2A;
-  background: #0D1B2A;
-  color: #ffffff;
 }
 
-/* CONTENEDOR GENERAL */
 .contenedor {
-  padding: 20px;
-  margin-top: 10px;
+  width: 90%;
+  max-width: 380px;
+  margin: 0 auto;
+  margin-top: 35px;
+  text-align: center;
 }
 
-/* TÍTULOS */
 .servicio {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
+  color: #ffffff;
   margin-bottom: 4px;
 }
 
 .prestador {
-  font-size: 15px;
-  opacity: 0.8;
-  margin-bottom: 24px;
-}
-
-/* ION-ITEM PERSONALIZADO */
-.item-custom {
-  --background: rgba(255, 255, 255, 0.06);
-  margin-bottom: 14px;
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  --inner-border-width: 0;
-  --padding-start: 16px;
-  --padding-end: 16px;
-  --min-height: 52px;
-}
-
-/* ESTADO (chip de solo lectura) */
-.item-estado {
-  align-items: center;
-}
-
-.chip-estado {
-  margin-left: auto;
-  font-weight: 600;
-  font-size: 13px;
-  border-radius: 999px;
-}
-
-/* Colores por estado */
-.chip-estado.confirmado {
-  background: rgba(46, 204, 113, 0.20);
-  color: #7ef2b3;
-}
-
-.chip-estado.pendiente {
-  background: rgba(241, 196, 15, 0.25);
-  color: #f9e795;
-}
-
-.chip-estado.cancelado {
-  background: rgba(77, 29, 29, 0.95);
-  color: #f58b8b;
-}
-
-.chip-estado.asistido {
-  background: rgba(90, 140, 255, 0.22);
-  color: #bcd6ff;
-}
-
-/* SUCURSAL ÚNICA (texto plano cuando no hay select) */
-.sucursal-unica {
-  margin-left: auto;
+  color: #b7c3d1;
+  margin-bottom: 30px;
   font-size: 14px;
-  font-weight: 500;
-  opacity: 0.9;
 }
 
-/* BOTÓN GUARDAR */
+.campo {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: rgba(255,255,255,0.07);
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+}
+
+.campo label {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #dfe7ef;
+  opacity: 0.85;
+}
+
+ion-input,
+ion-select {
+  --background: transparent;
+  --color: #ffffff;
+  font-size: 15px;
+}
+
 .btn-guardar {
-  margin-top: 26px;
+  margin-top: 10px;
   --background: #046865;
-  --background-activated: #03514f;
   --border-radius: 14px;
   height: 50px;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  font-size: 16px;
+  font-weight: bold;
 }
