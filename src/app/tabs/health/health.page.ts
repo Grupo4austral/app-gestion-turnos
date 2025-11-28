@@ -43,8 +43,8 @@ export class HealthPage implements OnInit {
     await this.cargarTurnos();
   }
 
+  // Usa el usuario de auth (UUID) y lo guarda en nuevoTurno.usuario_id
   async cargarUsuario() {
-    // Obtener el usuario autenticado dinámicamente
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       this.nuevoTurno.usuario_id = user.id;
@@ -62,7 +62,7 @@ export class HealthPage implements OnInit {
 
     const { data: sucursalesData } = await supabase
       .from('sucursal')
-      .select('id_sucursal, nombre');
+      .select('id_sucursal, nombre, direccion');
 
     this.servicios = (serviciosData || []).map(s => ({
       id: s.id_servicio,
@@ -80,15 +80,13 @@ export class HealthPage implements OnInit {
     }));
   }
 
+  // 🔥 Turnos pendientes = turnos FUTUROS del usuario, no cancelados
   async cargarTurnos() {
     this.isLoading = true;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      // Fecha y hora actual en ISO (la usamos para filtrar turnos futuros)
-      const ahoraISO = new Date().toISOString();
 
       const { data, error } = await supabase
         .from('turno')
@@ -99,20 +97,31 @@ export class HealthPage implements OnInit {
           notas,
           servicio:servicio(id_servicio, nombre),
           prestador:prestador(id_prestador, nombre),
-          sucursal:sucursal(id_sucursal, nombre)
+          sucursal:sucursal(id_sucursal, nombre, direccion)
         `)
         .eq('usuario_id', user.id)
-        .gte('inicio', ahoraISO)          // SOLO turnos desde ahora en adelante
         .order('inicio', { ascending: true });
 
-      if (!error && data) {
-        this.turnos = data.map((t: any) => ({
-          ...t,
-          servicio_nombre: t.servicio?.nombre || 'Sin servicio',
-          prestador_nombre: t.prestador?.nombre || 'Sin profesional',
-          sucursal_nombre: t.sucursal?.nombre || 'Sin sucursal'
-        }));
+      if (error) {
+        console.error('Error al cargar turnos:', error);
+        return;
       }
+
+      const ahora = new Date();
+
+      // FUTUROS y no cancelados
+      const turnosFuturos = (data || []).filter((t: any) =>
+        t.estado !== 'c' &&
+        t.estado !== 'cancelado' &&
+        new Date(t.inicio) > ahora
+      );
+
+      this.turnos = turnosFuturos.map((t: any) => ({
+        ...t,
+        servicio_nombre: t.servicio?.nombre || 'Sin servicio',
+        prestador_nombre: t.prestador?.nombre || 'Sin profesional',
+        sucursal_nombre: t.sucursal?.nombre || 'Sin sucursal'
+      }));
     } catch (error) {
       console.error('Error al cargar turnos:', error);
     } finally {
@@ -140,8 +149,8 @@ export class HealthPage implements OnInit {
 
     const nuevoTurnoData = {
       ...this.nuevoTurno,
-      usuario_id: user.id,
-      inicio: inicioLocal.toISOString(), // SE GUARDA EN UTC CORRECTO
+      usuario_id: user.id,                // usamos el UUID de auth
+      inicio: inicioLocal.toISOString(),  // se guarda en UTC correcto
       fin: finLocal.toISOString(),
     };
 
@@ -164,7 +173,7 @@ export class HealthPage implements OnInit {
         estado: 'pendiente',
         notas: ''
       };
-      await this.cargarTurnos();
+      await this.cargarTurnos(); // recarga pendientes abajo
     }
   }
 
@@ -181,7 +190,7 @@ export class HealthPage implements OnInit {
     await toast.present();
   }
 
-  // 👇 Nuevo método para interpretar correctamente el ion-datetime como hora local
+  // Interpreta el ion-datetime como hora local (Argentina) antes de pasarlo a UTC
   private parseIonDatetimeToLocalDate(value: string): Date {
     if (!value) return new Date();
 

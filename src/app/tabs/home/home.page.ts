@@ -35,71 +35,101 @@ export class HomePage {
     await this.cargarTurnos();
   }
 
+  // Solo para mostrar el nombre en el saludo (tabla usuario)
   async cargarUsuario() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) return;
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('usuario')
       .select('nombre_usuario')
       .eq('email', auth.user.email)
       .single();
 
+    if (error) {
+      console.error('Error cargando usuario en Home:', error);
+      return;
+    }
+
     if (data) this.nombreUsuario = data.nombre_usuario;
   }
 
- async cargarTurnos() {
-  const { data, error } = await supabase
-    .from('v_turnos_detalle')
-    .select('*')
-    .order('inicio', { ascending: true });
+  // 🔥 Lógica central: leer turnos del usuario desde la tabla turno
+  async cargarTurnos() {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth?.user) return;
 
-  if (error) return console.error(error);
+    const { data, error } = await supabase
+      .from('turno')
+      .select(`
+        id_turno,
+        inicio,
+        estado,
+        notas,
+        servicio:servicio(id_servicio, nombre),
+        prestador:prestador(id_prestador, nombre),
+        sucursal:sucursal(id_sucursal, nombre, direccion)
+      `)
+      .eq('usuario_id', auth.user.id)
+      .order('inicio', { ascending: true });
 
-  const ahora = new Date();
-
-  // =============== TURNOS ACTIVOS (futuros) ===============
-  this.turnosActivos = data.filter(t =>
-    t.estado !== 'c' &&                   // no cancelados
-    new Date(t.inicio) > ahora            // fecha futura
-  );
-
-  // =============== HISTORIAL (pasados o cancelados) ===============
-this.historial = data
-  .filter(t =>
-    t.estado === 'c' ||               // cancelados abreviados
-    t.estado === 'cancelado' ||       // cancelados normales
-    new Date(t.inicio) <= ahora       // pasó la fecha
-  )
-  .map(t => {
-
-    const inicio = new Date(t.inicio);
-
-    // 1️⃣ Cancelado
-    if (t.estado === 'c' || t.estado === 'cancelado') {
-      return { ...t, estado: 'cancelado' };
+    if (error) {
+      console.error('Error cargando turnos en Home:', error);
+      return;
     }
 
-    // 2️⃣ Pasó la fecha → Asistido SI O SI
-    if (inicio <= ahora) {
-      return { ...t, estado: 'asistido' };
+    const ahora = new Date();
+
+    // Normalizamos nombres para usar t.servicio, t.prestador, t.sucursal, t.direccion en el HTML
+    const turnos = (data || []).map((t: any) => ({
+      ...t,
+      servicio: t.servicio?.nombre || 'Sin servicio',
+      prestador: t.prestador?.nombre || 'Sin profesional',
+      sucursal: t.sucursal?.nombre || 'Sin sucursal',
+      direccion: t.sucursal?.direccion || ''
+    }));
+
+    // =============== TURNOS ACTIVOS (futuros, no cancelados) ===============
+    this.turnosActivos = turnos.filter(t =>
+      t.estado !== 'c' &&                // no cancelados abreviados
+      t.estado !== 'cancelado' &&        // no cancelados normales
+      new Date(t.inicio) > ahora         // fecha futura
+    );
+
+    // =============== HISTORIAL (pasados o cancelados) ===============
+    this.historial = turnos
+      .filter(t =>
+        t.estado === 'c' ||              // cancelados abreviados
+        t.estado === 'cancelado' ||      // cancelados normales
+        new Date(t.inicio) <= ahora      // ya pasó la fecha
+      )
+      .map(t => {
+        const inicio = new Date(t.inicio);
+
+        // 1️⃣ Cancelado
+        if (t.estado === 'c' || t.estado === 'cancelado') {
+          return { ...t, estado: 'cancelado' };
+        }
+
+        // 2️⃣ Pasó la fecha → Asistido sí o sí
+        if (inicio <= ahora) {
+          return { ...t, estado: 'asistido' };
+        }
+
+        // 3️⃣ Cualquier otra cosa rara → Confirmado
+        return { ...t, estado: 'confirmado' };
+      });
+
+    // =============== MANEJO DE PRÓXIMO / FUTUROS ===============
+    if (this.turnosActivos.length === 0) {
+      this.proximoTurno = null;
+      this.turnosFuturos = [];
+      return;
     }
 
-    // 3️⃣ Cualquier cosa rara → Confirmado
-    return { ...t, estado: 'confirmado' };
-  });
-
-
-  // =============== MANEJO DE PROXIMO / FUTUROS ===============
-  if (this.turnosActivos.length === 0) {
-    this.proximoTurno = null;
-    this.turnosFuturos = [];
-    return;
+    this.proximoTurno = this.turnosActivos[0];
+    this.turnosFuturos = this.turnosActivos.slice(1);
   }
-
-  this.proximoTurno = this.turnosActivos[0];
-  this.turnosFuturos = this.turnosActivos.slice(1);
-}
 
   editarTurno(turno: any) {
     this.router.navigate(['/tabs/stats'], {
@@ -118,14 +148,13 @@ this.historial = data
 
     const alert = await this.alertCtrl.create({
       header: 'Cancelar turno',
-      message: `¿Querés cancelar el turno de ${t.servicio}?${fecha}`,
+      message: `¿Querés cancelar el turno de ${t.servicio}? ${fecha}`,
       buttons: [
         { text: 'No', role: 'cancel' },
         {
           text: 'Sí, cancelar',
           role: 'destructive',
           handler: async () => {
-
             await supabase
               .from('turno')
               .update({ estado: 'cancelado' })
