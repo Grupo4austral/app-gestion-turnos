@@ -1,9 +1,9 @@
-  import { Component, OnInit } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { FormsModule } from '@angular/forms';
-  import { IonicModule, ToastController } from '@ionic/angular';
-  import { supabase } from '../../supabase';
-  import { AnalyticsService } from '../../services/analytics.service';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule, ToastController } from '@ionic/angular';
+import { supabase } from '../../supabase';
+import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
   selector: 'app-health',
@@ -82,9 +82,13 @@ export class HealthPage implements OnInit {
 
   async cargarTurnos() {
     this.isLoading = true;
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Fecha y hora actual en ISO (la usamos para filtrar turnos futuros)
+      const ahoraISO = new Date().toISOString();
 
       const { data, error } = await supabase
         .from('turno')
@@ -98,6 +102,7 @@ export class HealthPage implements OnInit {
           sucursal:sucursal(id_sucursal, nombre)
         `)
         .eq('usuario_id', user.id)
+        .gte('inicio', ahoraISO)          // SOLO turnos desde ahora en adelante
         .order('inicio', { ascending: true });
 
       if (!error && data) {
@@ -127,14 +132,17 @@ export class HealthPage implements OnInit {
       return;
     }
 
-    // Calcular fin automáticamente (1 hora después del inicio)
-    const inicioDate = new Date(this.nuevoTurno.inicio);
-    const finDate = new Date(inicioDate.getTime() + 60 * 60 * 1000);
+    // 1) Convertir el valor de ion-datetime a Date LOCAL (sin aplicar doble zona horaria)
+    const inicioLocal = this.parseIonDatetimeToLocalDate(this.nuevoTurno.inicio);
+
+    // 2) fin = inicio + 1 hora
+    const finLocal = new Date(inicioLocal.getTime() + 60 * 60 * 1000);
 
     const nuevoTurnoData = {
       ...this.nuevoTurno,
       usuario_id: user.id,
-      fin: finDate.toISOString(),
+      inicio: inicioLocal.toISOString(), // SE GUARDA EN UTC CORRECTO
+      fin: finLocal.toISOString(),
     };
 
     const { error } = await supabase.from('turno').insert([nuevoTurnoData]);
@@ -160,7 +168,10 @@ export class HealthPage implements OnInit {
     }
   }
 
-  async mostrarToast(mensaje: string, color: 'success' | 'danger' | 'warning' = 'success') {
+  async mostrarToast(
+    mensaje: string,
+    color: 'success' | 'danger' | 'warning' = 'success'
+  ) {
     const toast = await this.toastCtrl.create({
       message: mensaje,
       duration: 3000,
@@ -168,5 +179,23 @@ export class HealthPage implements OnInit {
       color: color
     });
     await toast.present();
+  }
+
+  // 👇 Nuevo método para interpretar correctamente el ion-datetime como hora local
+  private parseIonDatetimeToLocalDate(value: string): Date {
+    if (!value) return new Date();
+
+    // Quita Z o el offset como -03:00 (ej: 2025-11-27T13:45:00.000Z o 2025-11-27T13:45:00.000-03:00)
+    const clean = value.replace(/Z|([+-]\d{2}:\d{2})$/, '');
+    const [datePart, timePart] = clean.split('T');
+
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hour, minute, secondRaw] = (timePart || '00:00:00').split(':');
+    const hourNum = Number(hour);
+    const minuteNum = Number(minute);
+    const secondNum = Number(secondRaw || 0);
+
+    // Se interpreta como fecha/hora LOCAL (ej: Argentina)
+    return new Date(year, month - 1, day, hourNum, minuteNum, secondNum);
   }
 }
