@@ -209,9 +209,15 @@ export class ComentarioPage implements OnInit, OnDestroy {
       await this.mostrarToast('Comentario creado exitosamente', 'success');
       await this.cargarComentarios();
     } catch (error: any) {
-      console.error('Error al guardar comentario:', error);
-      const errorMsg = error?.message || JSON.stringify(error);
-      await this.mostrarToast(`Error al guardar comentario: ${errorMsg}`, 'danger');
+      console.error('Error completo al guardar comentario:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code
+      });
+      const errorMsg = error?.message || error?.details || error?.hint || 'Error desconocido';
+      await this.mostrarToast(`Error al guardar: ${errorMsg}`, 'danger');
     } finally {
       this.isLoading = false;
     }
