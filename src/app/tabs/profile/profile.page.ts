@@ -135,13 +135,15 @@ export class ProfilePage implements OnInit {
 
       const { error } = await this.supabase
         .from('usuario')
-        .update({
+        .upsert({
+          user_id: this.userId,
           nombre_usuario: this.nombre_usuario,
           ubicacion: this.ubicacion,
           dni: this.dni || null,
           avatar_path: this.selectedAvatarPath
-        })
-        .eq('user_id', this.userId);
+        }, {
+          onConflict: 'user_id'
+        });
 
       if (error) throw error;
 

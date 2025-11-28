@@ -125,7 +125,7 @@ export class ComentarioPage implements OnInit, OnDestroy {
     this.isLoading = true;
     try {
       this.comentarios = await this.db.getAll<Comentario>('comentario', {
-        orderBy: 'fecha_creacion',
+        orderBy: 'fecha_comentario',
         ascending: false
       });
       this.comentariosFiltrados = [...this.comentarios];
@@ -168,9 +168,11 @@ export class ComentarioPage implements OnInit, OnDestroy {
     this.isLoading = true;
     try {
       await this.db.insert<Comentario>('comentario', {
-        ...this.nuevoComentario as Comentario,
+        comentario: this.nuevoComentario.comentario || '',
+        descripcion: this.nuevoComentario.descripcion || '',
+        puntuacion: this.nuevoComentario.puntuacion || 5,
         usuario_id: this.userId,
-        fecha_creacion: new Date().toISOString()
+        fecha_comentario: new Date().toISOString()
       });
       
       this.analytics.trackComentarioCreated(5);
@@ -208,7 +210,7 @@ export class ComentarioPage implements OnInit, OnDestroy {
   }
 
   async actualizarComentario() {
-    const updateId = this.editando?.id || this.editando?.id_comentario;
+    const updateId = this.editando?.id_comentario || this.editando?.id;
     if (!updateId) {
       await this.mostrarToast('No hay comentario para actualizar', 'warning');
       return;
@@ -221,14 +223,10 @@ export class ComentarioPage implements OnInit, OnDestroy {
         updateId,
         {
           comentario: this.editando?.comentario,
-          titulo: this.editando?.titulo,
           descripcion: this.editando?.descripcion,
-          puntuacion: this.editando?.puntuacion,
-          categoria: this.editando?.categoria,
-          prioridad: this.editando?.prioridad,
-          estado: this.editando?.estado,
-          fecha_actualizacion: new Date().toISOString()
-        }
+          puntuacion: this.editando?.puntuacion
+        },
+        'id_comentario'
       );
       
       this.analytics.logEvent('comentario_actualizado', { id: updateId });
@@ -257,7 +255,7 @@ export class ComentarioPage implements OnInit, OnDestroy {
           handler: async () => {
             this.isLoading = true;
             try {
-              await this.db.delete('comentario', id);
+              await this.db.delete('comentario', id, 'id_comentario');
               this.analytics.logEvent('comentario_eliminado', { id });
               await this.mostrarToast('Comentario eliminado', 'success');
               await this.cargarComentarios();
