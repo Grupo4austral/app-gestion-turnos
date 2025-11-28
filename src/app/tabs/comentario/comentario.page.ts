@@ -106,7 +106,11 @@ export class ComentarioPage implements OnInit, OnDestroy {
   async ngOnInit() {
     this.analytics.trackPageView('comentarios', '/tabs/comentario');
     
-    // Suscribirse al usuario actual
+    // Obtener usuario actual directamente
+    const user = await this.db.getUser();
+    this.userId = user?.id || '';
+    
+    // Suscribirse a cambios del usuario
     this.db.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
@@ -125,7 +129,7 @@ export class ComentarioPage implements OnInit, OnDestroy {
     this.isLoading = true;
     try {
       this.comentarios = await this.db.getAll<Comentario>('comentario', {
-        orderBy: 'fecha_creacion',
+        orderBy: 'fecha_comentario',
         ascending: false
       });
       this.comentariosFiltrados = [...this.comentarios];
@@ -167,11 +171,25 @@ export class ComentarioPage implements OnInit, OnDestroy {
 
     this.isLoading = true;
     try {
-      await this.db.insert<Comentario>('comentario', {
-        ...this.nuevoComentario as Comentario,
-        usuario_id: this.userId,
-        fecha_creacion: new Date().toISOString()
-      });
+      if (!this.userId) {
+        await this.mostrarToast('Debes iniciar sesión para comentar', 'warning');
+        return;
+      }
+
+      const nuevoComentarioData = {
+        comentario: this.nuevoComentario.comentario || '',
+        descripcion: this.nuevoComentario.descripcion || '',
+        puntuacion: this.nuevoComentario.puntuacion || 5,
+        usuario_id: this.userId
+      };
+
+      console.log('Insertando comentario:', nuevoComentarioData);
+
+      const resultado = await this.db.insert<Comentario>('comentario', nuevoComentarioData);
+
+      if (!resultado) {
+        throw new Error('No se pudo crear el comentario');
+      }
       
       this.analytics.trackComentarioCreated(5);
       this.analytics.logEvent('comentario_creado', {
@@ -190,10 +208,16 @@ export class ComentarioPage implements OnInit, OnDestroy {
       
       await this.mostrarToast('Comentario creado exitosamente', 'success');
       await this.cargarComentarios();
-    } catch (error) {
-      console.error('Error al guardar', error);
-      this.analytics.trackError('comentario_creation_error', String(error));
-      await this.mostrarToast('Error al guardar comentario', 'danger');
+    } catch (error: any) {
+      console.error('Error completo al guardar comentario:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code
+      });
+      const errorMsg = error?.message || error?.details || error?.hint || 'Error desconocido';
+      await this.mostrarToast(`Error al guardar: ${errorMsg}`, 'danger');
     } finally {
       this.isLoading = false;
     }
@@ -208,9 +232,14 @@ export class ComentarioPage implements OnInit, OnDestroy {
   }
 
   async actualizarComentario() {
-    const updateId = this.editando?.id || this.editando?.id_comentario;
+    const updateId = this.editando?.id_comentario || this.editando?.id;
     if (!updateId) {
       await this.mostrarToast('No hay comentario para actualizar', 'warning');
+      return;
+    }
+
+    if (!this.userId) {
+      await this.mostrarToast('Debes iniciar sesión', 'warning');
       return;
     }
 
@@ -221,14 +250,10 @@ export class ComentarioPage implements OnInit, OnDestroy {
         updateId,
         {
           comentario: this.editando?.comentario,
-          titulo: this.editando?.titulo,
           descripcion: this.editando?.descripcion,
-          puntuacion: this.editando?.puntuacion,
-          categoria: this.editando?.categoria,
-          prioridad: this.editando?.prioridad,
-          estado: this.editando?.estado,
-          fecha_actualizacion: new Date().toISOString()
-        }
+          puntuacion: this.editando?.puntuacion
+        },
+        'id_comentario'
       );
       
       this.analytics.logEvent('comentario_actualizado', { id: updateId });
@@ -257,7 +282,7 @@ export class ComentarioPage implements OnInit, OnDestroy {
           handler: async () => {
             this.isLoading = true;
             try {
-              await this.db.delete('comentario', id);
+              await this.db.delete('comentario', id, 'id_comentario');
               this.analytics.logEvent('comentario_eliminado', { id });
               await this.mostrarToast('Comentario eliminado', 'success');
               await this.cargarComentarios();

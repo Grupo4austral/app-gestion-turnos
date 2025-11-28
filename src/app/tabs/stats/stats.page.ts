@@ -22,14 +22,17 @@ export class StatsPage {
 
   id_turno: number | null = null;
 
-  servicio: string = '';
-  prestador: string = '';
+  // IDs reales
+  id_servicio!: number;
+  id_prestador!: number;
+  id_sucursal!: number;
+
+  servicios: any[] = [];
+  prestadores: any[] = [];
+  sucursales: any[] = [];
 
   fecha: string = '';
   hora: string = '';
-
-  sucursales: string[] = [];
-  sucursalSeleccionada: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -41,49 +44,60 @@ export class StatsPage {
     this.route.queryParams.subscribe(async params => {
       this.id_turno = params['id_turno'];
       if (this.id_turno) {
+        await this.cargarListas();
         await this.cargarTurno();
       }
     });
   }
 
+  async cargarListas() {
+    const { data: serv } = await supabase.from('servicio').select('*');
+    const { data: pres } = await supabase.from('prestador').select('*');
+    const { data: suc } = await supabase.from('sucursal').select('*');
+
+    this.servicios = serv || [];
+    this.prestadores = pres || [];
+    this.sucursales = suc || [];
+  }
+
   async cargarTurno() {
     const { data, error } = await supabase
-      .from('v_turnos_detalle')
+      .from('turno')
       .select('*')
       .eq('id_turno', this.id_turno)
       .single();
 
     if (error || !data) return;
 
-    this.servicio = data.servicio;
-    this.prestador = data.prestador;
+    this.id_servicio = data.id_servicio;
+    this.id_prestador = data.id_prestador;
+    this.id_sucursal = data.id_sucursal;
 
     const inicio = new Date(data.inicio);
     this.fecha = inicio.toISOString().slice(0, 10);
     this.hora = inicio.toTimeString().slice(0, 5);
-
-    // Cargar sucursales disponibles del servicio
-    const { data: suc } = await supabase
-      .from('prestador_sucursal')
-      .select('direccion')
-      .eq('prestador', data.prestador);
-
-    this.sucursales = suc?.map(s => s.direccion) || [];
-    this.sucursalSeleccionada = data.sucursal_direccion;
   }
 
   async guardarCambios() {
-    const nuevaFecha = `${this.fecha}T${this.hora}:00`;
+    const inicioLocal = new Date(`${this.fecha}T${this.hora}:00`);
+    const finLocal = new Date(inicioLocal.getTime() + 60 * 60 * 1000);
 
-    await supabase
+    const { error } = await supabase
       .from('turno')
       .update({
-        inicio: nuevaFecha,
-        sucursal_direccion: this.sucursalSeleccionada
+        id_servicio: this.id_servicio,
+        id_prestador: this.id_prestador,
+        id_sucursal: this.id_sucursal,
+        inicio: inicioLocal.toISOString(),
+        fin: finLocal.toISOString()
       })
       .eq('id_turno', this.id_turno);
+
+    if (error) {
+      console.error("UPDATE ERROR:", error);
+      return;
+    }
 
     this.router.navigate(['/tabs/home']);
   }
 }
-

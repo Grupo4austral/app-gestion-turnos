@@ -30,91 +30,97 @@ export class HomePage {
     private alertCtrl: AlertController
   ) {}
 
-  // ============================
-  // AL ENTRAR A LA SCREEN
-  // ============================
   async ionViewWillEnter() {
     await this.cargarUsuario();
     await this.cargarTurnos();
   }
 
-  // ============================
-  // CARGAR USUARIO + DEBUG
-  // ============================
+  // Solo para mostrar el nombre en el saludo (tabla usuario)
   async cargarUsuario() {
     const { data: auth } = await supabase.auth.getUser();
-
-    console.log("📌 Usuario autenticado:", auth?.user);
-
-    if (!auth?.user) {
-      console.log("⚠ No hay usuario logueado");
-      return;
-    }
-
-    const email = auth.user.email;
-    console.log("📌 Email del usuario:", email);
+    if (!auth?.user) return;
 
     const { data, error } = await supabase
       .from('usuario')
-      .select('nombre_usuario, email')
-      .eq('email', email)
+      .select('nombre_usuario')
+      .eq('email', auth.user.email)
       .single();
 
-    console.log("📌 Resultado consulta tabla usuario:", data, error);
-
-    if (data?.nombre_usuario) {
-      this.nombreUsuario = data.nombre_usuario;
-    } else {
-      console.log("⚠ No se encontró el nombre en la tabla usuario.");
+    if (error) {
+      console.error('Error cargando usuario en Home:', error);
+      return;
     }
+
+    if (data) this.nombreUsuario = data.nombre_usuario;
   }
 
-  // ============================
-  // CARGAR TURNOS
-  // ============================
+  // 🔥 Lógica central: leer turnos del usuario desde la tabla turno
   async cargarTurnos() {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth?.user) return;
+
     const { data, error } = await supabase
-      .from('v_turnos_detalle')
-      .select('*')
+      .from('turno')
+      .select(`
+        id_turno,
+        inicio,
+        estado,
+        notas,
+        servicio:servicio(id_servicio, nombre),
+        prestador:prestador(id_prestador, nombre),
+        sucursal:sucursal(id_sucursal, nombre, direccion)
+      `)
+      .eq('usuario_id', auth.user.id)
       .order('inicio', { ascending: true });
 
     if (error) {
-      console.error("❌ Error cargando turnos:", error);
+      console.error('Error cargando turnos en Home:', error);
       return;
     }
 
     const ahora = new Date();
 
-    // --- TURNOS FUTUROS (NO cancelados) ---
-    this.turnosActivos = data.filter(t =>
-      t.estado !== 'c' &&
-      t.estado !== 'cancelado' &&
-      new Date(t.inicio) > ahora
+    // Normalizamos nombres para usar t.servicio, t.prestador, t.sucursal, t.direccion en el HTML
+    const turnos = (data || []).map((t: any) => ({
+      ...t,
+      servicio: t.servicio?.nombre || 'Sin servicio',
+      prestador: t.prestador?.nombre || 'Sin profesional',
+      sucursal: t.sucursal?.nombre || 'Sin sucursal',
+      direccion: t.sucursal?.direccion || ''
+    }));
+
+    // =============== TURNOS ACTIVOS (futuros, no cancelados) ===============
+    this.turnosActivos = turnos.filter(t =>
+      t.estado !== 'c' &&                // no cancelados abreviados
+      t.estado !== 'cancelado' &&        // no cancelados normales
+      new Date(t.inicio) > ahora         // fecha futura
     );
 
-    // --- HISTORIAL ---
-    this.historial = data
+    // =============== HISTORIAL (pasados o cancelados) ===============
+    this.historial = turnos
       .filter(t =>
-        t.estado === 'c' ||
-        t.estado === 'cancelado' ||
-        new Date(t.inicio) <= ahora
+        t.estado === 'c' ||              // cancelados abreviados
+        t.estado === 'cancelado' ||      // cancelados normales
+        new Date(t.inicio) <= ahora      // ya pasó la fecha
       )
       .map(t => {
-
         const inicio = new Date(t.inicio);
 
+        // 1️⃣ Cancelado
         if (t.estado === 'c' || t.estado === 'cancelado') {
           return { ...t, estado: 'cancelado' };
         }
 
+        // 2️⃣ Pasó la fecha → Asistido sí o sí
         if (inicio <= ahora) {
           return { ...t, estado: 'asistido' };
         }
 
+        // 3️⃣ Cualquier otra cosa rara → Confirmado
         return { ...t, estado: 'confirmado' };
       });
 
-    // --- PROXIMO Y FUTUROS ---
+    // =============== MANEJO DE PRÓXIMO / FUTUROS ===============
     if (this.turnosActivos.length === 0) {
       this.proximoTurno = null;
       this.turnosFuturos = [];
@@ -125,18 +131,12 @@ export class HomePage {
     this.turnosFuturos = this.turnosActivos.slice(1);
   }
 
-  // ============================
-  // EDITAR TURNO
-  // ============================
   editarTurno(turno: any) {
     this.router.navigate(['/tabs/stats'], {
       queryParams: { id_turno: turno.id_turno }
     });
   }
 
-  // ============================
-  // CANCELAR TURNO
-  // ============================
   async cancelarTurno(t: any) {
     const fecha = new Date(t.inicio).toLocaleString('es-AR', {
       weekday: 'long',
@@ -148,14 +148,13 @@ export class HomePage {
 
     const alert = await this.alertCtrl.create({
       header: 'Cancelar turno',
-      message: `¿Querés cancelar el turno de ${t.servicio}?${fecha}`,
+      message: `¿Querés cancelar el turno de ${t.servicio}? ${fecha}`,
       buttons: [
         { text: 'No', role: 'cancel' },
         {
           text: 'Sí, cancelar',
           role: 'destructive',
           handler: async () => {
-
             await supabase
               .from('turno')
               .update({ estado: 'cancelado' })
@@ -170,9 +169,6 @@ export class HomePage {
     await alert.present();
   }
 
-  // ============================
-  // ABRIR MAPS
-  // ============================
   abrirMapa(direccion: string) {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
     window.open(url, '_blank');

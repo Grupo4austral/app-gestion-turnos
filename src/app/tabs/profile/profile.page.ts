@@ -75,7 +75,7 @@ export class ProfilePage implements OnInit {
           this.nombre_usuario = perfil.nombre_usuario ?? '';
           this.ubicacion = perfil.ubicacion ?? '';
           this.dni = perfil.dni ?? '';
-          this.selectedAvatarPath = perfil.avatar_path ?? this.selectedAvatarPath;
+          // Avatar se maneja solo en el frontend
         }
       }
     } catch (error) {
@@ -94,8 +94,7 @@ export class ProfilePage implements OnInit {
           user_id: this.userId,
           nombre_usuario: '',
           ubicacion: '',
-          dni: null,
-          avatar_path: this.selectedAvatarPath
+          dni: null
         });
 
       if (error) throw error;
@@ -133,23 +132,29 @@ export class ProfilePage implements OnInit {
         this.dniError = false;
       }
 
+      const datosActualizacion = {
+        user_id: this.userId,
+        nombre_usuario: this.nombre_usuario,
+        ubicacion: this.ubicacion,
+        dni: this.dni || null
+      };
+
+      console.log('Actualizando perfil:', datosActualizacion);
+
       const { error } = await this.supabase
         .from('usuario')
-        .update({
-          nombre_usuario: this.nombre_usuario,
-          ubicacion: this.ubicacion,
-          dni: this.dni || null,
-          avatar_path: this.selectedAvatarPath
-        })
-        .eq('user_id', this.userId);
+        .upsert(datosActualizacion, {
+          onConflict: 'user_id'
+        });
 
       if (error) throw error;
 
       this.editarActivo = false;
       await this.mostrarToast('✅ Perfil actualizado correctamente');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al actualizar perfil:', error);
-      await this.mostrarToast('❌ Error al guardar cambios', 'danger');
+      const errorMsg = error?.message || error?.error_description || JSON.stringify(error);
+      await this.mostrarToast(`❌ Error al guardar cambios: ${errorMsg}`, 'danger');
     }
   }
 

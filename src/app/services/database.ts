@@ -84,16 +84,29 @@ export class DatabaseService {
    */
   async insert<T = any>(table: string, record: Partial<T>): Promise<T | null> {
     try {
+      console.log(`Insertando en ${table}:`, record);
+      
       const { data, error } = await supabase
         .from(table)
         .insert([record])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error(`Error de Supabase al insertar en ${table}:`, error);
+        console.error('Detalles del error:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        throw error;
+      }
+      
+      console.log(`Insertado exitosamente en ${table}:`, data);
       return data as T;
     } catch (error) {
-      console.error(`Error inserting into ${table}:`, error);
+      console.error(`Error insertando en ${table}:`, error);
       throw error;
     }
   }
