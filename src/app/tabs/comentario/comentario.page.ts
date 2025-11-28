@@ -106,7 +106,11 @@ export class ComentarioPage implements OnInit, OnDestroy {
   async ngOnInit() {
     this.analytics.trackPageView('comentarios', '/tabs/comentario');
     
-    // Suscribirse al usuario actual
+    // Obtener usuario actual directamente
+    const user = await this.db.getUser();
+    this.userId = user?.id || '';
+    
+    // Suscribirse a cambios del usuario
     this.db.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
@@ -167,13 +171,25 @@ export class ComentarioPage implements OnInit, OnDestroy {
 
     this.isLoading = true;
     try {
-      await this.db.insert<Comentario>('comentario', {
+      if (!this.userId) {
+        await this.mostrarToast('Debes iniciar sesión para comentar', 'warning');
+        return;
+      }
+
+      const nuevoComentarioData = {
         comentario: this.nuevoComentario.comentario || '',
         descripcion: this.nuevoComentario.descripcion || '',
         puntuacion: this.nuevoComentario.puntuacion || 5,
-        usuario_id: this.userId,
-        fecha_comentario: new Date().toISOString()
-      });
+        usuario_id: this.userId
+      };
+
+      console.log('Insertando comentario:', nuevoComentarioData);
+
+      const resultado = await this.db.insert<Comentario>('comentario', nuevoComentarioData);
+
+      if (!resultado) {
+        throw new Error('No se pudo crear el comentario');
+      }
       
       this.analytics.trackComentarioCreated(5);
       this.analytics.logEvent('comentario_creado', {
@@ -192,10 +208,10 @@ export class ComentarioPage implements OnInit, OnDestroy {
       
       await this.mostrarToast('Comentario creado exitosamente', 'success');
       await this.cargarComentarios();
-    } catch (error) {
-      console.error('Error al guardar', error);
-      this.analytics.trackError('comentario_creation_error', String(error));
-      await this.mostrarToast('Error al guardar comentario', 'danger');
+    } catch (error: any) {
+      console.error('Error al guardar comentario:', error);
+      const errorMsg = error?.message || JSON.stringify(error);
+      await this.mostrarToast(`Error al guardar comentario: ${errorMsg}`, 'danger');
     } finally {
       this.isLoading = false;
     }
@@ -213,6 +229,11 @@ export class ComentarioPage implements OnInit, OnDestroy {
     const updateId = this.editando?.id_comentario || this.editando?.id;
     if (!updateId) {
       await this.mostrarToast('No hay comentario para actualizar', 'warning');
+      return;
+    }
+
+    if (!this.userId) {
+      await this.mostrarToast('Debes iniciar sesión', 'warning');
       return;
     }
 

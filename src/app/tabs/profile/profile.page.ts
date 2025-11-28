@@ -133,15 +133,19 @@ export class ProfilePage implements OnInit {
         this.dniError = false;
       }
 
+      const datosActualizacion = {
+        user_id: this.userId,
+        nombre_usuario: this.nombre_usuario,
+        ubicacion: this.ubicacion,
+        dni: this.dni || null,
+        avatar_path: this.selectedAvatarPath
+      };
+
+      console.log('Actualizando perfil:', datosActualizacion);
+
       const { error } = await this.supabase
         .from('usuario')
-        .upsert({
-          user_id: this.userId,
-          nombre_usuario: this.nombre_usuario,
-          ubicacion: this.ubicacion,
-          dni: this.dni || null,
-          avatar_path: this.selectedAvatarPath
-        }, {
+        .upsert(datosActualizacion, {
           onConflict: 'user_id'
         });
 
@@ -149,9 +153,10 @@ export class ProfilePage implements OnInit {
 
       this.editarActivo = false;
       await this.mostrarToast('✅ Perfil actualizado correctamente');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al actualizar perfil:', error);
-      await this.mostrarToast('❌ Error al guardar cambios', 'danger');
+      const errorMsg = error?.message || error?.error_description || JSON.stringify(error);
+      await this.mostrarToast(`❌ Error al guardar cambios: ${errorMsg}`, 'danger');
     }
   }
 
