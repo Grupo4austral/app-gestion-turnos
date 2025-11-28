@@ -30,83 +30,113 @@ export class HomePage {
     private alertCtrl: AlertController
   ) {}
 
+  // ============================
+  // AL ENTRAR A LA SCREEN
+  // ============================
   async ionViewWillEnter() {
     await this.cargarUsuario();
     await this.cargarTurnos();
   }
 
+  // ============================
+  // CARGAR USUARIO + DEBUG
+  // ============================
   async cargarUsuario() {
     const { data: auth } = await supabase.auth.getUser();
-    if (!auth?.user) return;
 
-    const { data } = await supabase
+    console.log("📌 Usuario autenticado:", auth?.user);
+
+    if (!auth?.user) {
+      console.log("⚠ No hay usuario logueado");
+      return;
+    }
+
+    const email = auth.user.email;
+    console.log("📌 Email del usuario:", email);
+
+    const { data, error } = await supabase
       .from('usuario')
-      .select('nombre_usuario')
-      .eq('email', auth.user.email)
+      .select('nombre_usuario, email')
+      .eq('email', email)
       .single();
 
-    if (data) this.nombreUsuario = data.nombre_usuario;
+    console.log("📌 Resultado consulta tabla usuario:", data, error);
+
+    if (data?.nombre_usuario) {
+      this.nombreUsuario = data.nombre_usuario;
+    } else {
+      console.log("⚠ No se encontró el nombre en la tabla usuario.");
+    }
   }
 
- async cargarTurnos() {
-  const { data, error } = await supabase
-    .from('v_turnos_detalle')
-    .select('*')
-    .order('inicio', { ascending: true });
+  // ============================
+  // CARGAR TURNOS
+  // ============================
+  async cargarTurnos() {
+    const { data, error } = await supabase
+      .from('v_turnos_detalle')
+      .select('*')
+      .order('inicio', { ascending: true });
 
-  if (error) return console.error(error);
-
-  const ahora = new Date();
-
-  // =============== TURNOS ACTIVOS (futuros) ===============
-  this.turnosActivos = data.filter(t =>
-    t.estado !== 'c' &&                   // no cancelados
-    new Date(t.inicio) > ahora            // fecha futura
-  );
-
-  // =============== HISTORIAL (pasados o cancelados) ===============
-this.historial = data
-  .filter(t =>
-    t.estado === 'c' ||               // cancelados abreviados
-    t.estado === 'cancelado' ||       // cancelados normales
-    new Date(t.inicio) <= ahora       // pasó la fecha
-  )
-  .map(t => {
-
-    const inicio = new Date(t.inicio);
-
-    // 1️⃣ Cancelado
-    if (t.estado === 'c' || t.estado === 'cancelado') {
-      return { ...t, estado: 'cancelado' };
+    if (error) {
+      console.error("❌ Error cargando turnos:", error);
+      return;
     }
 
-    // 2️⃣ Pasó la fecha → Asistido SI O SI
-    if (inicio <= ahora) {
-      return { ...t, estado: 'asistido' };
+    const ahora = new Date();
+
+    // --- TURNOS FUTUROS (NO cancelados) ---
+    this.turnosActivos = data.filter(t =>
+      t.estado !== 'c' &&
+      t.estado !== 'cancelado' &&
+      new Date(t.inicio) > ahora
+    );
+
+    // --- HISTORIAL ---
+    this.historial = data
+      .filter(t =>
+        t.estado === 'c' ||
+        t.estado === 'cancelado' ||
+        new Date(t.inicio) <= ahora
+      )
+      .map(t => {
+
+        const inicio = new Date(t.inicio);
+
+        if (t.estado === 'c' || t.estado === 'cancelado') {
+          return { ...t, estado: 'cancelado' };
+        }
+
+        if (inicio <= ahora) {
+          return { ...t, estado: 'asistido' };
+        }
+
+        return { ...t, estado: 'confirmado' };
+      });
+
+    // --- PROXIMO Y FUTUROS ---
+    if (this.turnosActivos.length === 0) {
+      this.proximoTurno = null;
+      this.turnosFuturos = [];
+      return;
     }
 
-    // 3️⃣ Cualquier cosa rara → Confirmado
-    return { ...t, estado: 'confirmado' };
-  });
-
-
-  // =============== MANEJO DE PROXIMO / FUTUROS ===============
-  if (this.turnosActivos.length === 0) {
-    this.proximoTurno = null;
-    this.turnosFuturos = [];
-    return;
+    this.proximoTurno = this.turnosActivos[0];
+    this.turnosFuturos = this.turnosActivos.slice(1);
   }
 
-  this.proximoTurno = this.turnosActivos[0];
-  this.turnosFuturos = this.turnosActivos.slice(1);
-}
-
+  // ============================
+  // EDITAR TURNO
+  // ============================
   editarTurno(turno: any) {
     this.router.navigate(['/tabs/stats'], {
       queryParams: { id_turno: turno.id_turno }
     });
   }
 
+  // ============================
+  // CANCELAR TURNO
+  // ============================
   async cancelarTurno(t: any) {
     const fecha = new Date(t.inicio).toLocaleString('es-AR', {
       weekday: 'long',
@@ -140,6 +170,9 @@ this.historial = data
     await alert.present();
   }
 
+  // ============================
+  // ABRIR MAPS
+  // ============================
   abrirMapa(direccion: string) {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
     window.open(url, '_blank');
