@@ -1,57 +1,58 @@
-.editar-background {
-  --background: #0D1B2A;
-}
-
-.contenedor {
-  width: 90%;
-  max-width: 380px;
-  margin: 0 auto;
-  margin-top: 35px;
-  text-align: center;
-}
-
-.servicio {
-  font-size: 28px;
-  font-weight: 700;
+/* ======== FONDO GENERAL ======== */
+ion-content {
+  --background: linear-gradient(180deg, #0a2342, #1e3a66);
   color: #ffffff;
-  margin-bottom: 4px;
 }
 
-.prestador {
-  color: #b7c3d1;
-  margin-bottom: 30px;
-  font-size: 14px;
+/* ======== CONTENEDOR ======== */
+.contenedor {
+  padding: 20px;
+  color: #ffffff;
 }
 
-.campo {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  background: rgba(255,255,255,0.07);
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 18px;
+/* ======== LABELS ======== */
+label {
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
 }
 
-.campo label {
-  font-size: 13px;
-  margin-bottom: 6px;
-  color: #dfe7ef;
-  opacity: 0.85;
+/* ======== ION-INPUT ======== */
+ion-input {
+  --color: #ffffff !important;
+  --placeholder-color: #cbd5e1 !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 12px;
+  border-radius: 10px;
 }
 
-ion-input,
+/* ======== ION-SELECT ======== */
 ion-select {
-  --background: transparent;
-  --color: #ffffff;
-  font-size: 15px;
+  --placeholder-color: #cbd5e1 !important;
+  --color: #ffffff !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 12px;
+  border-radius: 10px;
 }
 
+/* ======== OPCIONES DEL SELECT ======== */
+ion-select::part(text) {
+  color: #ffffff !important;
+}
+
+ion-select-option {
+  color: #000000 !important; /* en el popup quedan negros por default (bien) */
+}
+
+/* ======== BOTÓN GUARDAR ======== */
 .btn-guardar {
-  margin-top: 10px;
-  --background: #046865;
-  --border-radius: 14px;
-  height: 50px;
-  font-size: 16px;
-  font-weight: bold;
+  margin-top: 20px;
+  --background: #2563eb;
+  --background-hover: #1e40af;
+  --color: #ffffff;
+  font-weight: 700;
+  border-radius: 12px;
 }
