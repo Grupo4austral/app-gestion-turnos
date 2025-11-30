@@ -2,14 +2,11 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Auth } from 'src/app/services/auth';
-import { addIcons } from 'ionicons';
-import { constructOutline } from 'ionicons/icons';
 
 import {
   IonTabs,
   IonTabBar,
-  IonTabButton,
-  IonIcon
+  IonTabButton
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -22,15 +19,12 @@ import {
     RouterModule,
     IonTabs,
     IonTabBar,
-    IonTabButton,
-    IonIcon
+    IonTabButton
   ]
 })
 
 export class TabsPage {
-  constructor(private auth: Auth, private router: Router) {
-    addIcons({ constructOutline });
-  }
+  constructor(private auth: Auth, private router: Router) {}
 
   async logoutDirect() {
     await this.auth.logout();
