@@ -94,7 +94,9 @@ export class ProfilePage implements OnInit {
           user_id: this.userId,
           nombre_usuario: '',
           ubicacion: '',
-          dni: null
+          dni: null,
+          email: this.email,
+          contrasenia: ''
         });
 
       if (error) throw error;
@@ -136,7 +138,9 @@ export class ProfilePage implements OnInit {
         user_id: this.userId,
         nombre_usuario: this.nombre_usuario,
         ubicacion: this.ubicacion,
-        dni: this.dni || null
+        dni: this.dni || null,
+        email: this.email,
+        contrasenia: ''
       };
 
       console.log('Actualizando perfil:', datosActualizacion);
