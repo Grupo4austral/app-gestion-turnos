@@ -1,4 +1,6 @@
-/* TIPOGRAFÍA */
+/* -------------------------------------------
+   TIPOGRAFÍA
+--------------------------------------------*/
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 * {
@@ -6,217 +8,205 @@
   letter-spacing: .2px;
 }
 
-/* FONDO */
+/* -------------------------------------------
+   FONDO (claro, elegante, tipo login)
+--------------------------------------------*/
 .home-background {
-  --background: transparent!important;
+  --background: transparent !important;
+
   background:
-    radial-gradient(circle at top left, #1e6f7f33 0%, transparent 40%),
-    radial-gradient(circle at bottom right, #113a4733 0%, transparent 55%),
-    linear-gradient(180deg, #0A1624 0%, #0E2135 100%);
-  position: relative;
+    radial-gradient(circle at 20% 20%, rgba(2, 80, 114, 0.39) 0%, transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(8, 69, 96, 0.39) 0%, transparent 60%),
+    linear-gradient(180deg, #3e556a 0%, #165568 40%, #2a5967 100%);
 }
 
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at top, rgba(255,255,255,.05), rgba(0,0,0,.55));
-  pointer-events: none;
-  z-index: 1;
-}
+/* Quitamos overlay oscuro */
+.overlay { display: none; }
 
-/* HEADER */
+/* -------------------------------------------
+   HEADER
+--------------------------------------------*/
 ion-toolbar {
-  --background: rgba(12,29,48,.85);
-  backdrop-filter: blur(14px);
-  color: #E8EEF7 !important;
+  --background: #4d6780;
+  border-bottom: 1px solid #3e5871;
+  backdrop-filter: blur(15px);
+  color: #b9c8c8 !important;
   font-size: 20px;
   font-weight: 700;
 }
 
-/* CONTENIDO */
+/* -------------------------------------------
+   CONTENIDO 
+--------------------------------------------*/
 .contenido {
   padding-bottom: 120px;
-  z-index: 2;
 }
 
-/* BIENVENIDA */
+/* -------------------------------------------
+   BIENVENIDA
+--------------------------------------------*/
 .bienvenida {
-  padding-left: 22px !important;
-  padding-right: 22px !important;
+  padding: 0 22px;
   margin-bottom: 6px;
 }
 
-.bienvenida p {
-  margin-top: 0;
-}
-
 .bienvenida h1 {
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 700;
-  color: #F4F7FB;
+  color: #c0c2c4;
 }
 
 .subtitulo-principal {
-  font-size: 18px;
-  opacity: .8;
+  font-size: 17px;
+  color: #aeafb5;
 }
 
-/* TARJETAS */
+/* -------------------------------------------
+   TARJETAS (Claras, profesionales)
+--------------------------------------------*/
 .tarjeta {
   margin: 18px;
   padding: 22px;
   border-radius: 18px;
-  background: rgba(14,32,50,.55);
-  border: 1px solid rgba(255,255,255,.05);
+  
+  background: rgba(224, 240, 250, 0.592);
+  border: 1px solid rgba(6, 98, 144, 0.262);
+  box-shadow: 0 6px 22px rgba(40, 106, 142, 0);
+
   backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px rgba(0,0,0,.4);
-  color: #F4F7FB;
+
+  color: #1c2732;
 }
 
-/* HEADER DE TURNO */
+/* -------------------------------------------
+   HEADER TURNO
+--------------------------------------------*/
 .header-turno {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* ESTADOS */
+/* -------------------------------------------
+   ESTADOS
+--------------------------------------------*/
 .estado {
   padding: 6px 14px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
 }
 
-
 .estado.confirmado {
-  background: rgba(46,204,113,.20);
-  color: #7ef2b3;
+  background: #70ba7a8c;
+  color: #0f4e30;
 }
 
 .estado.cancelado {
-  background: rgba(77, 29, 29, 0.978);
-  color: #f58b8b;
+  background: #c76e6ea2;
+  color: #53160f;
 }
 
 .estado.asistido {
-  background: rgba(90,140,255,.22);
-  color: #bcd6ff;
+  background: #7a8da4dd;
+  color: #0e4679;
 }
 
-/* INFO */
+/* -------------------------------------------
+   INFO DEL TURNO
+--------------------------------------------*/
 .info-row {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-top: 8px;
+  color: #2D3E50;
 }
 
 .info-row ion-icon {
-  font-size: 18px;
+  font-size: 20px;
+  color: #535b83;
 }
 
-
-
-/* CONTENEDOR DE UBICACIÓN */
-.info-row.ubicacion {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-/* TEXTO CLICKEABLE SOLO HASTA DONDE LLEGA */
+/* Dirección  */
 .ubicacion-texto {
   cursor: pointer;
-  color: #d9f1ff;
+  color: #293848;
   font-weight: 600;
-  text-decoration: none;
-  display: inline-block;  
-  width: fit-content;      
 }
 
 .ubicacion-texto:hover {
-  opacity: .6;
+  opacity: .7;
 }
 
-
-
-/* ACCIONES */
+/* -------------------------------------------
+   BOTONES
+--------------------------------------------*/
 .acciones {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
-  gap: 28px;
+  gap: 22px;
   margin-top: 25px;
 }
 
-.acciones ion-button {
-  font-size: 16px;
+.btn-modificar {
+  --background: #efe3aead !important;
+  --color: #6f684a !important;
+  border-radius: 8px;
+  font-weight: 600;
+  
+  
+}
+
+.btn-cancelar {
+  --background: #c6454557 !important;
+  --color: #540a0a !important;
+  border-radius: 8px;
   font-weight: 600;
 }
 
-/* TÍTULOS */
+/* -------------------------------------------
+   TÍTULOS SECCIÓN HISTORIAL
+--------------------------------------------*/
 .subtitulo {
   margin-left: 22px;
   margin-top: 16px;
   font-size: 22px;
   font-weight: 700;
-  color: #dfe8ff;
+  color: #c6cfd8;
 }
 
-/* BOTÓN FAB */
-.boton-pro {
-  --background: #25675e;
-  --background-activated: #1f5d55;
-  --background-focused: #1f5d55;
-  --background-hover: #2f7f75;
-
-  height: 55px;
-  width: 200px;
-
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-
-  border-radius: 999px !important; /* Redondea el ion-button */
-}
-
-/* NECESARIO PARA QUE EL REDONDEADO SE APLIQUE DE VERDAD */
-.boton-pro::part(native) {
-  border-radius: 999px !important; /* Redondea la parte interna REAL del botón */
-  padding-left: 22px;
-  padding-right: 22px;
-}
-
-
-/* BOTÓN MODIFICAR (fondo dorado) */
-.btn-modificar {
-  --background: #867544 !important;
-  --background-hover: #6d5c36 !important;
-  --background-activated: #5e512d !important;
-  --color: white !important;
-  padding: 6px 16px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 16px;
-}
-
-/* BOTÓN CANCELAR (fondo rojo) */
-.btn-cancelar {
-  --background: #800606ba !important;
-  --background-hover: #811c1c !important;
-  --background-activated: #541b1b !important;
-  --color: rgb(245, 206, 206) !important;
-  padding: 6px 16px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 16px;
-}
-
-/* CENTRAR TODO */
+/* -------------------------------------------
+   CONTENEDOR GENERAL
+--------------------------------------------*/
 .wrapper {
   max-width: 950px;
   margin: 0 auto;
-  padding: 0 50px;
+  padding: 0 16px;
 }
+
+/* -------------------------------------------
+   BOTÓN SACAR TURNO
+--------------------------------------------*/
+.boton-pro {
+  --background: #3f6b6d; /* azul profesional */
+  --background-hover: #518587;
+  --background-activated: #447071;
+
+  --color: rgba(239, 243, 242, 0.722);
+
+  height: 55px;
+  padding: 0 28px;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  border-radius: 999px !important;
+}
+
+/* Necesario para que el botón quede bien redondeado */
+.boton-pro::part(native) {
+  border-radius: 999px !important;
+}
+
+

@@ -11,29 +11,15 @@
 
   <div class="contenedor">
 
-    <!-- SERVICIO -->
-    <div class="campo">
-      <label>Servicio</label>
-      <ion-select [(ngModel)]="id_servicio">
-        <ion-select-option 
-          *ngFor="let s of servicios"
-          [value]="s.id_servicio">
-          {{ s.nombre }}
-        </ion-select-option>
-      </ion-select>
+    <!-- Encabezado -->
+    <div class="header-servicio">
+      <h1 class="servicio-titulo">{{ nombreServicio }}</h1>
+
+      <div class="chip-profesional">
+       {{ nombreProfesional }}
+      </div>
     </div>
 
-    <!-- PROFESIONAL -->
-    <div class="campo">
-      <label>Profesional</label>
-      <ion-select [(ngModel)]="id_prestador">
-        <ion-select-option 
-          *ngFor="let p of prestadores"
-          [value]="p.id_prestador">
-          {{ p.nombre }}
-        </ion-select-option>
-      </ion-select>
-    </div>
 
     <!-- FECHA -->
     <div class="campo">

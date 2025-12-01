@@ -1,16 +1,49 @@
+ion-toolbar {
+  --background: #4d6780;
+  --color: #ffffff;
+}
 /* ======== FONDO GENERAL ======== */
 ion-content {
-  --background: linear-gradient(180deg, #0a2342, #1e3a66);
+  --background: linear-gradient(180deg, #2f647b, #2984a0);
   color: #ffffff;
 }
 
-/* ======== CONTENEDOR ======== */
+/* ======== CONTENEDOR CENTRAL ======== */
 .contenedor {
-  padding: 20px;
-  color: #ffffff;
+  max-width: 600px;    
+  margin: 0 auto;      
+  padding: 20px 25px; 
 }
 
-/* ======== LABELS ======== */
+/* ======== ENCABEZADO  ======== */
+.header-servicio {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 25px;
+}
+
+.servicio-titulo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.chip-profesional {
+  display: inline-block;
+  background: #28788c;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ======== CAMPOS ======== */
+.campo {
+  margin-bottom: 18px;
+}
+
 label {
   color: #ffffff;
   font-weight: 600;
@@ -18,40 +51,20 @@ label {
   display: block;
 }
 
-/* ======== ION-INPUT ======== */
-ion-input {
-  --color: #ffffff !important;
-  --placeholder-color: #cbd5e1 !important;
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 12px;
-  border-radius: 10px;
-}
-
-/* ======== ION-SELECT ======== */
+ion-input,
 ion-select {
-  --placeholder-color: #cbd5e1 !important;
-  --color: #ffffff !important;
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.12);
+  --color: #ffffff;
+  --placeholder-color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.21);
   padding: 12px;
   border-radius: 10px;
-}
-
-/* ======== OPCIONES DEL SELECT ======== */
-ion-select::part(text) {
-  color: #ffffff !important;
-}
-
-ion-select-option {
-  color: #000000 !important; /* en el popup quedan negros por default (bien) */
 }
 
 /* ======== BOTÓN GUARDAR ======== */
 .btn-guardar {
-  margin-top: 20px;
-  --background: #2563eb;
-  --background-hover: #1e40af;
+  margin-top: 25px;
+  --background: #2e8282;
+  --background-hover: #106888;
   --color: #ffffff;
   font-weight: 700;
   border-radius: 12px;
