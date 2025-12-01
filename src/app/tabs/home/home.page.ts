@@ -30,12 +30,27 @@ export class HomePage {
     private alertCtrl: AlertController
   ) {}
 
+  // Se ejecuta apenas se crea el componente
+  ngOnInit() {
+    // ESCUCHA EL EVENTO ENVIADO DESDE STATS
+    window.addEventListener('turno_actualizado', async () => {
+      console.log("Evento recibido: turno_actualizado → recargando turnos");
+      await this.cargarTurnos();
+    });
+  }
+
+  /**  SE EJECUTA CADA VEZ QUE APARECE ESTA PÁGINA */
   async ionViewWillEnter() {
     await this.cargarUsuario();
     await this.cargarTurnos();
   }
 
-  // Solo para mostrar el nombre en el saludo (tabla usuario)
+  /**  SE EJECUTA SIEMPRE DESPUÉS DE NAVEGAR A HOME */
+  async ionViewDidEnter() {
+    await this.cargarTurnos();
+  }
+
+  /**  Nombre del usuario */
   async cargarUsuario() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) return;
@@ -54,7 +69,7 @@ export class HomePage {
     if (data) this.nombreUsuario = data.nombre_usuario;
   }
 
-  // 🔥 Lógica central: leer turnos del usuario desde la tabla turno
+  /**  Carga los turnos del usuario */
   async cargarTurnos() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) return;
@@ -80,7 +95,6 @@ export class HomePage {
 
     const ahora = new Date();
 
-    // Normalizamos nombres para usar t.servicio, t.prestador, t.sucursal, t.direccion en el HTML
     const turnos = (data || []).map((t: any) => ({
       ...t,
       servicio: t.servicio?.nombre || 'Sin servicio',
@@ -89,38 +103,36 @@ export class HomePage {
       direccion: t.sucursal?.direccion || ''
     }));
 
-    // =============== TURNOS ACTIVOS (futuros, no cancelados) ===============
+   
+    // FUTUROS
     this.turnosActivos = turnos.filter(t =>
-      t.estado !== 'c' &&                // no cancelados abreviados
-      t.estado !== 'cancelado' &&        // no cancelados normales
-      new Date(t.inicio) > ahora         // fecha futura
+      t.estado !== 'c' &&
+      t.estado !== 'cancelado' &&
+      new Date(t.inicio) > ahora
     );
 
-    // =============== HISTORIAL (pasados o cancelados) ===============
+    // HISTORIAL
     this.historial = turnos
       .filter(t =>
-        t.estado === 'c' ||              // cancelados abreviados
-        t.estado === 'cancelado' ||      // cancelados normales
-        new Date(t.inicio) <= ahora      // ya pasó la fecha
+        t.estado === 'c' ||
+        t.estado === 'cancelado' ||
+        new Date(t.inicio) <= ahora
       )
       .map(t => {
         const inicio = new Date(t.inicio);
 
-        // 1️⃣ Cancelado
         if (t.estado === 'c' || t.estado === 'cancelado') {
           return { ...t, estado: 'cancelado' };
         }
 
-        // 2️⃣ Pasó la fecha → Asistido sí o sí
         if (inicio <= ahora) {
           return { ...t, estado: 'asistido' };
         }
 
-        // 3️⃣ Cualquier otra cosa rara → Confirmado
         return { ...t, estado: 'confirmado' };
       });
 
-    // =============== MANEJO DE PRÓXIMO / FUTUROS ===============
+    // PROXIMO
     if (this.turnosActivos.length === 0) {
       this.proximoTurno = null;
       this.turnosFuturos = [];
@@ -131,6 +143,7 @@ export class HomePage {
     this.turnosFuturos = this.turnosActivos.slice(1);
   }
 
+  
   editarTurno(turno: any) {
     this.router.navigate(['/tabs/stats'], {
       queryParams: { id_turno: turno.id_turno }
