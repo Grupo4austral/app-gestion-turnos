@@ -54,7 +54,7 @@
 
           <p class="ubicacion-texto"
              (click)="abrirMapa(proximoTurno.sucursal_direccion)">
-            {{ proximoTurno.sucursal }} — {{ proximoTurno.sucursal_direccion }}
+            {{ proximoTurno.sucursal }} — {{ proximoTurno.direccion }}
           </p>
         </div>
 
@@ -87,8 +87,8 @@
           <ion-icon name="location-outline"></ion-icon>
 
           <p class="ubicacion-texto"
-             (click)="abrirMapa(t.sucursal_direccion)">
-            {{ t.sucursal }} — {{ t.sucursal_direccion }}
+             (click)="abrirMapa(t.direccion)">
+            {{ t.sucursal }} — {{ t.direccion }}
           </p>
         </div>
 
@@ -129,8 +129,8 @@
           <ion-icon name="location-outline"></ion-icon>
 
           <p class="ubicacion-texto"
-             (click)="abrirMapa(h.sucursal_direccion)">
-            {{ h.sucursal }} — {{ h.sucursal_direccion }}
+             (click)="abrirMapa(h.direccion)">
+            {{ h.sucursal }} — {{ h.direccion }}
           </p>
         </div>
 
