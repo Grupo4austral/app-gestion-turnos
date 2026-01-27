@@ -74,12 +74,8 @@ export class ComentarioPage implements OnInit, OnDestroy {
   comentariosFiltrados: Comentario[] = [];
   nuevoComentario: Partial<Comentario> = { 
     comentario: '',
-    titulo: '', 
     descripcion: '', 
-    puntuacion: 5,
-    categoria: 'general',
-    prioridad: 'media',
-    estado: 'pendiente'
+    puntuacion: 5
   };
   editando: Comentario | null = null;
   userId: string = '';
@@ -164,17 +160,18 @@ export class ComentarioPage implements OnInit, OnDestroy {
   }
 
   async guardarComentario() {
-    if (!this.nuevoComentario.comentario?.trim() && !this.nuevoComentario.titulo?.trim()) {
+    if (!this.nuevoComentario.comentario?.trim()) {
       await this.mostrarToast('El comentario es requerido', 'warning');
+      return;
+    }
+
+    if (!this.userId) {
+      await this.mostrarToast('Debes iniciar sesión para comentar', 'warning');
       return;
     }
 
     this.isLoading = true;
     try {
-      if (!this.userId) {
-        await this.mostrarToast('Debes iniciar sesión para comentar', 'warning');
-        return;
-      }
 
       const nuevoComentarioData = {
         comentario: this.nuevoComentario.comentario || '',
@@ -198,12 +195,8 @@ export class ComentarioPage implements OnInit, OnDestroy {
       
       this.nuevoComentario = { 
         comentario: '',
-        titulo: '', 
         descripcion: '',
-        puntuacion: 5,
-        categoria: 'general',
-        prioridad: 'media',
-        estado: 'pendiente'
+        puntuacion: 5
       };
       
       await this.mostrarToast('Comentario creado exitosamente', 'success');
