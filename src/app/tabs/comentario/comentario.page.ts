@@ -152,7 +152,7 @@ export class ComentarioPage implements OnInit, OnDestroy {
     } else {
       const term = this.searchTerm.toLowerCase();
       this.comentariosFiltrados = this.comentarios.filter(c =>
-        c.titulo?.toLowerCase().includes(term) ||
+        (c.comentario && c.comentario.toLowerCase().includes(term)) ||
         (c.descripcion && c.descripcion.toLowerCase().includes(term))
       );
     }

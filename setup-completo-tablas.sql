@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS public.usuario (
   ubicacion text,
   dni text,
   email text,
-  contrasenia text DEFAULT '',
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
