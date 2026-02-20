@@ -22,7 +22,7 @@ export class LoginPage implements OnInit {
   email: string = '';
   password: string = '';
   errorMessage = '';
-
+  
   constructor(
     private auth: Auth, 
     private router: Router,
