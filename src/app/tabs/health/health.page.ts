@@ -86,7 +86,10 @@ export class HealthPage implements OnInit {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        this.isLoading = false;
+        return;
+      }
 
       const { data, error } = await supabase
         .from('turno')

@@ -1,14 +1,13 @@
 export interface Turno {
-  id?: number;
-  paciente_id: string;
-  servicio_id: number;
-  prestador_id: number;
-  sucursal_id: number;
-  fecha: string;
-  hora_inicio: string;
-  hora_fin: string;
-  estado?: 'pendiente' | 'confirmado' | 'cancelado' | 'completado';
-  observaciones?: string;
+  id_turno?: number;
+  usuario_id: string;
+  id_servicio: number;
+  id_prestador: number;
+  id_sucursal: number;
+  inicio: string;
+  fin: string;
+  estado?: 'pendiente' | 'confirmado' | 'cancelado' | 'completado' | 'c';
+  notas?: string;
   created_at?: string;
   updated_at?: string;
 }
