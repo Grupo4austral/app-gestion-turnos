@@ -318,7 +318,7 @@ async ngOnInit() {
 ```typescript
 async cargarComentarios() {
   this.isLoading = true;  // Activa el spinner de carga
-  try {
+  try {4
     // Obtiene todos los comentarios, ordenados por fecha (más recientes primero)
     this.comentarios = await this.db.getAll('comentario', 'fecha_comentario', false);
     // Copia los comentarios a la lista filtrada
