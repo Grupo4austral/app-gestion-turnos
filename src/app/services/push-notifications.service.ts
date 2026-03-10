@@ -66,13 +66,4 @@ export class PushNotificationsService {
     console.log('Token a enviar al servidor:', token);
   }
 
-  async getDeliveredNotifications(): Promise<any> {
-    const notificationList = await PushNotifications.getDeliveredNotifications();
-    console.log('Notificaciones entregadas:', notificationList);
-    return notificationList;
-  }
-
-  async removeAllNotifications(): Promise<void> {
-    await PushNotifications.removeAllDeliveredNotifications();
-  }
 }

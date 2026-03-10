@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { supabase } from '../supabase';
-import { BehaviorSubject, Observable, from } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface QueryOptions {
   orderBy?: string;

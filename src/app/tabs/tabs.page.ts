@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Auth } from 'src/app/services/auth';
 
@@ -15,7 +14,6 @@ import {
   templateUrl: './tabs.page.html',
   styleUrls: ['./tabs.page.scss'],
   imports: [
-    CommonModule,
     RouterModule,
     IonTabs,
     IonTabBar,

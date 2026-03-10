@@ -58,25 +58,8 @@ export class AnalyticsService {
     await this.trackEvent('turno_created', turnoData);
   }
 
-  async trackComentarioCreated(comentarioData: any) {
-    await this.trackEvent('comentario_created', comentarioData);
-  }
-
-  // Alias para compatibilidad
-  async logEvent(eventName: string, eventData?: any) {
-    await this.trackEvent(eventName, eventData);
-  }
-
-  async trackServicioCreated(servicioData: any) {
-    await this.trackEvent('servicio_created', servicioData);
-  }
-
   async trackLogin(method: string = 'email') {
     await this.trackEvent('user_login', { method });
-  }
-
-  async trackLogout() {
-    await this.trackEvent('user_logout');
   }
 
   async trackError(errorMessage: string, context?: any) {

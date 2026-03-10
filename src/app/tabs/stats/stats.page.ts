@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonicModule, AlertController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { createClient } from '@supabase/supabase-js';
@@ -26,8 +26,6 @@ export class StatsPage {
   nombreServicio: string = '';
   nombreProfesional: string = '';
 
-  mostrarCalendario: boolean = false;
-
   // Datos editables
   fecha: string = '';
   hora: string = '';
@@ -38,24 +36,8 @@ export class StatsPage {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
-    private alertCtrl: AlertController
+    private router: Router
   ) {}
-
-  // FECHA FORMATEADA PARA MOSTRAR EN EL INPUT
-  get fechaFormateada() {
-    if (!this.fecha) return '';
-    const d = new Date(this.fecha);
-    return d.toLocaleDateString('es-AR');
-  }
-
-  toggleCalendario() {
-    this.mostrarCalendario = !this.mostrarCalendario;
-  }
-
-  actualizarFecha() {
-    this.mostrarCalendario = false;
-  }
 
   async ionViewWillEnter() {
     this.route.queryParams.subscribe(async params => {
