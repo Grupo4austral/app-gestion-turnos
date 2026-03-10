@@ -1,13 +1,6 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { supabase } from '../supabase';
 import { Router } from '@angular/router';
-
-export interface AuthUser {
-  id: string;
-  email?: string;
-  [key: string]: any;
-}
 
 @Injectable({
   providedIn: 'root',

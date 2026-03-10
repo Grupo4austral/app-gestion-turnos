@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { supabase } from '../../supabase';
 import { Router } from '@angular/router';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
@@ -15,7 +14,6 @@ import { ThemeService } from '../../services/theme.service';
   imports: [CommonModule, IonicModule, FormsModule],
 })
 export class ProfilePage implements OnInit {
-  private supabase: SupabaseClient = supabase;
 
   nombre_usuario: string = '';
   email: string = '';
@@ -55,14 +53,14 @@ export class ProfilePage implements OnInit {
 
   async cargarDatosUsuario() {
     try {
-      const { data, error } = await this.supabase.auth.getUser();
-      if (error) throw error;
+const { data, error } = await supabase.auth.getUser();
+    if (error) throw error;
 
       if (data?.user) {
         this.userId = data.user.id;
         this.email = data.user.email ?? '';
 
-        const { data: perfil, error: errPerfil } = await this.supabase
+        const { data: perfil, error: errPerfil } = await supabase
           .from('usuario')
           .select('*')
           .eq('user_id', this.userId)
@@ -88,7 +86,7 @@ export class ProfilePage implements OnInit {
     try {
       if (!this.userId) return;
 
-      const { error } = await this.supabase
+      const { error } = await supabase
         .from('usuario')
         .insert({
           user_id: this.userId,
@@ -143,7 +141,7 @@ export class ProfilePage implements OnInit {
 
       console.log('Actualizando perfil:', datosActualizacion);
 
-      const { error } = await this.supabase
+      const { error } = await supabase
         .from('usuario')
         .upsert(datosActualizacion, {
           onConflict: 'user_id'
@@ -183,7 +181,7 @@ export class ProfilePage implements OnInit {
           role: 'destructive',
           handler: async () => {
             try {
-              await this.supabase.auth.signOut();
+              await supabase.auth.signOut();
               await this.mostrarToast('👋 Sesión cerrada exitosamente', 'success');
               this.router.navigate(['/login']);
             } catch (error) {

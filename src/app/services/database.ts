@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { supabase } from '../supabase';
-import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface QueryOptions {
   orderBy?: string;
@@ -13,18 +12,6 @@ export interface QueryOptions {
   providedIn: 'root',
 })
 export class DatabaseService {
-  // Cache de usuario actual
-  private currentUserSubject = new BehaviorSubject<any>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
-
-  constructor() {
-    this.initializeUser();
-  }
-
-  private async initializeUser() {
-    const user = await this.getUser();
-    this.currentUserSubject.next(user);
-  }
 
   /**
    * Obtiene todos los registros de una tabla con opciones de paginación
@@ -217,21 +204,9 @@ export class DatabaseService {
     }
   }
 
-  /**
-   * Obtiene el usuario actual (con cache)
-   */
   async getUser() {
     const { data } = await supabase.auth.getUser();
-    const user = data?.user ?? null;
-    this.currentUserSubject.next(user);
-    return user;
-  }
-
-  /**
-   * Observable del usuario actual
-   */
-  getUserObservable(): Observable<any> {
-    return this.currentUser$;
+    return data?.user ?? null;
   }
 }
 
