@@ -36,6 +36,7 @@ build-error.log
 
 # Node
 /node_modules
+/node_modules_backup
 npm-debug.log
 yarn-error.log
 

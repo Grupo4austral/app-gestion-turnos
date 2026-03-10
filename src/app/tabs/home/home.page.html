@@ -1,0 +1,18 @@
+<ion-content class="home-background">
+  <div class="home-container">
+    <h1 class="home-title">Gestión de Turnos</h1>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" *ngFor="let s of servicios">
+          <ion-card class="service-card" (click)="goTo(s.ruta)" button>
+            <ion-card-content>
+              <ion-icon [name]="s.icono" class="service-icon"></ion-icon>
+              <p class="service-name">{{ s.nombre }}</p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
