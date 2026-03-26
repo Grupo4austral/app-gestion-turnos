@@ -22,7 +22,7 @@
           [(ngModel)]="nuevoComentario.comentario"
           placeholder="Escribí tu comentario..."
           rows="3"
-          autoGrow="true">
+          [autoGrow]="true">
         </ion-textarea>
       </ion-item>
 
@@ -37,7 +37,7 @@
       <ion-item lines="none">
         <ion-label>Puntuación: {{ nuevoComentario.puntuacion }}/10</ion-label>
         <ion-range
-          min="1" max="10" step="1" pin="true"
+          min="1" max="10" step="1" [pin]="true"
           [(ngModel)]="nuevoComentario.puntuacion"
           slot="end" style="max-width:200px">
         </ion-range>
@@ -54,12 +54,12 @@
   <!-- Formulario: editar comentario -->
   <ion-card *ngIf="editando">
     <ion-card-header>
-      <ion-card-title>Editar Comentario</ion-card-title>
-      <ion-buttons slot="end">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <ion-card-title>Editar Comentario</ion-card-title>
         <ion-button fill="clear" (click)="editando = null">
           <ion-icon name="close-outline"></ion-icon>
         </ion-button>
-      </ion-buttons>
+      </div>
     </ion-card-header>
     <ion-card-content>
 
@@ -67,7 +67,7 @@
         <ion-label position="stacked">Comentario *</ion-label>
         <ion-textarea
           [(ngModel)]="editando.comentario"
-          rows="3" autoGrow="true">
+          rows="3" [autoGrow]="true">
         </ion-textarea>
       </ion-item>
 
@@ -79,7 +79,7 @@
       <ion-item lines="none">
         <ion-label>Puntuación: {{ editando.puntuacion }}/10</ion-label>
         <ion-range
-          min="1" max="10" step="1" pin="true"
+          min="1" max="10" step="1" [pin]="true"
           [(ngModel)]="editando.puntuacion"
           slot="end" style="max-width:200px">
         </ion-range>

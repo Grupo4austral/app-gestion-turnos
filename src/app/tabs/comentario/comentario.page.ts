@@ -93,7 +93,7 @@ export class ComentarioPage implements OnInit {
 
   async cargarComentarios() {
     try {
-      this.comentarios = await this.db.getAll('comentario', { orderBy: 'fecha_comentario', ascending: false });
+      this.comentarios = await this.db.getAll<Comentario>('comentario', { orderBy: 'fecha_comentario', ascending: false });
     } catch (e) {
       console.error('Error al cargar comentarios', e);
     }
