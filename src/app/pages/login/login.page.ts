@@ -37,7 +37,17 @@ export class LoginPage implements OnInit {
     const { data, error } = await this.auth.login(this.email, this.password);
 
     if (error) {
-      const errorMsg = (error as any)?.message || 'Error desconocido';
+      const raw = (error as any)?.message;
+      let errorMsg: string;
+      if (!raw || raw === '{}' || raw.trim() === '') {
+        errorMsg = 'No se pudo conectar con el servidor. Verificá tu conexión o intentá más tarde.';
+      } else if (raw === 'Invalid login credentials') {
+        errorMsg = 'Correo o contraseña incorrectos.';
+      } else if (raw === 'Email not confirmed') {
+        errorMsg = 'Debés confirmar tu correo antes de ingresar.';
+      } else {
+        errorMsg = raw;
+      }
       this.errorMessage = errorMsg;
       console.error(error);
       this.analytics.trackError('login_error', errorMsg);
