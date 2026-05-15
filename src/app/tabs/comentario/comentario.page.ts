@@ -20,7 +20,8 @@ import {
   IonList,
   IonListHeader,
   IonButtons,
-  AlertController
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -31,6 +32,7 @@ import {
   trashOutline
 } from 'ionicons/icons';
 import { DatabaseService } from '../../services/database';
+import { supabase } from '../../supabase';
 
 interface Comentario {
   id_comentario?: number;
@@ -73,9 +75,13 @@ export class ComentarioPage implements OnInit {
   comentarios: Comentario[] = [];
   nuevoComentario: Comentario = { comentario: '', descripcion: '', puntuacion: 5 };
   editando: Comentario | null = null;
-  userId: string = '';
+  userId: string | null = null;
 
-  constructor(private db: DatabaseService, private alertCtrl: AlertController) {
+  constructor(
+    private db: DatabaseService,
+    private alertCtrl: AlertController,
+    private toastCtrl: ToastController
+  ) {
     addIcons({
       addCircleOutline,
       saveOutline,
@@ -86,8 +92,8 @@ export class ComentarioPage implements OnInit {
   }
 
   async ngOnInit() {
-    const user = await this.db.getUser();
-    this.userId = user?.id || '';
+    const { data: { session } } = await supabase.auth.getSession();
+    this.userId = session?.user?.id ?? null;
     this.cargarComentarios();
   }
 
@@ -102,12 +108,25 @@ export class ComentarioPage implements OnInit {
   async guardarComentario() {
     if (!this.nuevoComentario.comentario?.trim()) return;
     try {
-      await this.db.insert('comentario', { ...this.nuevoComentario, usuario_id: this.userId });
+      const record: Record<string, unknown> = {
+        comentario: this.nuevoComentario.comentario,
+        descripcion: this.nuevoComentario.descripcion || null,
+        puntuacion: this.nuevoComentario.puntuacion,
+        usuario_id: this.userId
+      };
+      await this.db.insert('comentario', record);
       this.nuevoComentario = { comentario: '', descripcion: '', puntuacion: 5 };
+      await this.mostrarToast('✅ Comentario guardado', 'success');
       this.cargarComentarios();
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error al guardar', e);
+      await this.mostrarToast('❌ Error al guardar: ' + (e?.message || 'Error desconocido'), 'danger');
     }
+  }
+
+  async mostrarToast(mensaje: string, color: string = 'success') {
+    const toast = await this.toastCtrl.create({ message: mensaje, duration: 2500, color });
+    await toast.present();
   }
 
   editar(c: Comentario) {
@@ -122,15 +141,17 @@ export class ComentarioPage implements OnInit {
         this.editando.id_comentario,
         {
           comentario: this.editando.comentario,
-          descripcion: this.editando.descripcion,
+          descripcion: this.editando.descripcion || null,
           puntuacion: this.editando.puntuacion,
         },
-        'id_comentario' // PK real de la tabla
+        'id_comentario'
       );
       this.editando = null;
+      await this.mostrarToast('✅ Comentario actualizado', 'success');
       this.cargarComentarios();
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error al actualizar', e);
+      await this.mostrarToast('❌ Error al actualizar: ' + (e?.message || 'Error desconocido'), 'danger');
     }
   }
 
@@ -145,9 +166,11 @@ export class ComentarioPage implements OnInit {
           handler: async () => {
             try {
               await this.db.delete('comentario', id, 'id_comentario');
+              await this.mostrarToast('🗑️ Comentario eliminado', 'medium');
               this.cargarComentarios();
-            } catch (e) {
+            } catch (e: any) {
               console.error('Error al eliminar', e);
+              await this.mostrarToast('❌ Error al eliminar: ' + (e?.message || 'Error desconocido'), 'danger');
             }
           },
         },
