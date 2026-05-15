@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { supabase } from '../../supabase';
 
 @Component({
@@ -34,12 +35,11 @@ export class StatsPage {
   ) {}
 
   async ionViewWillEnter() {
-    this.route.queryParams.subscribe(async params => {
-      this.id_turno = params['id_turno'];
+    const params = await firstValueFrom(this.route.queryParams);
+    this.id_turno = params['id_turno'];
 
-      await this.cargarSucursales();
-      await this.cargarTurno();
-    });
+    await this.cargarSucursales();
+    await this.cargarTurno();
   }
 
   async cargarSucursales() {

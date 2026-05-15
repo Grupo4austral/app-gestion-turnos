@@ -16,7 +16,7 @@ export class Auth {
   private initializeAuth() {
     supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        if (session) {
+        if (session && !this.router.url.startsWith('/tabs')) {
           this.router.navigate(['/tabs']);
         }
       } else if (event === 'SIGNED_OUT') {

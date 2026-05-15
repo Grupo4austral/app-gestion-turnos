@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { supabase } from '../../supabase';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-profile',
@@ -44,7 +45,8 @@ export class ProfilePage implements OnInit {
     private router: Router, 
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    private auth: Auth
   ) {}
 
   async ngOnInit() {
@@ -181,9 +183,8 @@ const { data, error } = await supabase.auth.getUser();
           role: 'destructive',
           handler: async () => {
             try {
-              await supabase.auth.signOut();
+              await this.auth.logout();
               await this.mostrarToast('👋 Sesión cerrada exitosamente', 'success');
-              this.router.navigate(['/login']);
             } catch (error) {
               console.error('Error al cerrar sesión:', error);
               await this.mostrarToast('❌ Error al cerrar sesión', 'danger');
