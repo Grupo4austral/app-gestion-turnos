@@ -14,8 +14,12 @@ export class Auth {
    * Inicializa el estado de autenticación y escucha cambios
    */
   private initializeAuth() {
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        if (session) {
+          this.router.navigate(['/tabs']);
+        }
+      } else if (event === 'SIGNED_OUT') {
         this.router.navigate(['/login']);
       }
     });

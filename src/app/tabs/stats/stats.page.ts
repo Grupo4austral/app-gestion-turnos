@@ -3,13 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { createClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
-
-const supabase = createClient(
-  environment.supabase.url,
-  environment.supabase.anonKey
-);
+import { supabase } from '../../supabase';
 
 @Component({
   selector: 'app-stats',
