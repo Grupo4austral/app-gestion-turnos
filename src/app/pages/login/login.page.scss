@@ -87,26 +87,3 @@
   box-shadow: 0 4px 12px #6b84a1(9, 31, 74, 0.4);
 }
 
-/* ===== Footer ===== */
-.footer-text {
-  font-size: 0.9rem;
-  margin-top: 1.2rem;
-  color: #dedcdcf9;
-
-  a {
-    color: #2c4057;
-    font-weight: 600;
-    text-decoration: none;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}

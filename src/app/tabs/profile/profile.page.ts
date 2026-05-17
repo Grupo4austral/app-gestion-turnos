@@ -3,7 +3,6 @@ import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { supabase } from '../../supabase';
-import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { Auth } from '../../services/auth';
 
@@ -42,7 +41,6 @@ export class ProfilePage implements OnInit {
   userId: string | null = null;
 
   constructor(
-    private router: Router, 
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
     public themeService: ThemeService,
