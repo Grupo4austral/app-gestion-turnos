@@ -76,6 +76,7 @@ export class ComentarioPage implements OnInit {
   nuevoComentario: Comentario = { comentario: '', descripcion: '', puntuacion: 5 };
   editando: Comentario | null = null;
   userId: string | null = null;
+  isLoading = false;
 
   constructor(
     private db: DatabaseService,
@@ -98,21 +99,33 @@ export class ComentarioPage implements OnInit {
   }
 
   async cargarComentarios() {
+    this.isLoading = true;
     try {
       this.comentarios = await this.db.getAll<Comentario>('comentario', { orderBy: 'fecha_comentario', ascending: false });
     } catch (e) {
       console.error('Error al cargar comentarios', e);
+      await this.mostrarToast('❌ Error al cargar comentarios', 'danger');
+    } finally {
+      this.isLoading = false;
     }
   }
 
   async guardarComentario() {
-    if (!this.nuevoComentario.comentario?.trim()) return;
+    if (!this.nuevoComentario.comentario?.trim()) {
+      await this.mostrarToast('⚠️ El comentario no puede estar vacío', 'warning');
+      return;
+    }
+    if (!this.userId) {
+      await this.mostrarToast('⚠️ Debes estar autenticado', 'warning');
+      return;
+    }
     try {
       const record: Record<string, unknown> = {
-        comentario: this.nuevoComentario.comentario,
-        descripcion: this.nuevoComentario.descripcion || null,
-        puntuacion: this.nuevoComentario.puntuacion,
-        usuario_id: this.userId
+        comentario: this.nuevoComentario.comentario.trim(),
+        descripcion: this.nuevoComentario.descripcion?.trim() || null,
+        puntuacion: Math.max(1, Math.min(10, this.nuevoComentario.puntuacion || 5)),
+        usuario_id: this.userId,
+        fecha_comentario: new Date().toISOString()
       };
       await this.db.insert('comentario', record);
       this.nuevoComentario = { comentario: '', descripcion: '', puntuacion: 5 };
@@ -130,19 +143,31 @@ export class ComentarioPage implements OnInit {
   }
 
   editar(c: Comentario) {
+    if (c.usuario_id !== this.userId) {
+      this.mostrarToast('⚠️ Solo puedes editar tus propios comentarios', 'warning');
+      return;
+    }
     this.editando = { ...c };
   }
 
   async actualizarComentario() {
     if (!this.editando?.id_comentario) return;
+    if (!this.editando.comentario?.trim()) {
+      await this.mostrarToast('⚠️ El comentario no puede estar vacío', 'warning');
+      return;
+    }
+    if (this.editando.usuario_id !== this.userId) {
+      await this.mostrarToast('⚠️ Solo puedes editar tus propios comentarios', 'warning');
+      return;
+    }
     try {
       await this.db.update(
         'comentario',
         this.editando.id_comentario,
         {
-          comentario: this.editando.comentario,
-          descripcion: this.editando.descripcion || null,
-          puntuacion: this.editando.puntuacion,
+          comentario: this.editando.comentario.trim(),
+          descripcion: this.editando.descripcion?.trim() || null,
+          puntuacion: Math.max(1, Math.min(10, this.editando.puntuacion || 5)),
         },
         'id_comentario'
       );
@@ -155,7 +180,11 @@ export class ComentarioPage implements OnInit {
     }
   }
 
-  async eliminarComentario(id: number) {
+  async eliminarComentario(comentario: Comentario) {
+    if (comentario.usuario_id !== this.userId) {
+      await this.mostrarToast('⚠️ Solo puedes eliminar tus propios comentarios', 'warning');
+      return;
+    }
     const alert = await this.alertCtrl.create({
       header: 'Confirmar',
       message: '¿Deseás eliminar este comentario?',
@@ -165,7 +194,7 @@ export class ComentarioPage implements OnInit {
           text: 'Eliminar',
           handler: async () => {
             try {
-              await this.db.delete('comentario', id, 'id_comentario');
+              await this.db.delete('comentario', comentario.id_comentario!, 'id_comentario');
               await this.mostrarToast('🗑️ Comentario eliminado', 'medium');
               this.cargarComentarios();
             } catch (e: any) {
